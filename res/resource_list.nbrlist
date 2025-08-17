@@ -1,0 +1,17 @@
+# :: TEXTURE @textures 
+# textures 
+
+# :: CUBEMAP @cubemaps
+# cubemaps
+
+# :: MODEL @models 
+# models
+
+:: SHADER @shaders
+template_shader.glsl
+
+# :: FONT @fonts
+# fonts
+
+# :: AUDIO @audio 
+# audio 
