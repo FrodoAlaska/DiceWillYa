@@ -1,17 +1,19 @@
-# :: TEXTURE @textures 
-# textures 
+:: TEXTURE
+textures 
 
-# :: CUBEMAP @cubemaps
-# cubemaps
+:: CUBEMAP
+cubemaps
 
-# :: MODEL @models 
-# models
+:: MODEL
+$models
+dice/scene.gltf
 
-:: SHADER @shaders
-template_shader.glsl
+# :: SHADER
+# shaders
 
-# :: FONT @fonts
-# fonts
+:: FONT
+$fonts
+Kleader.ttf
 
-# :: AUDIO @audio 
+# :: AUDIO
 # audio 

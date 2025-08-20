@@ -5,8 +5,7 @@
 int main(int argc, char** argv) {
   // Some useful flags
   int win_flags = nikola::WINDOW_FLAGS_FOCUS_ON_CREATE | 
-                  nikola::WINDOW_FLAGS_CENTER_MOUSE    |
-                  nikola::WINDOW_FLAGS_HIDE_CURSOR;
+                  nikola::WINDOW_FLAGS_CENTER_MOUSE;
   
   // App init
   nikola::AppDesc app_desc {
@@ -17,9 +16,9 @@ int main(int argc, char** argv) {
     .render_fn     = app_render, 
     .render_gui_fn = app_render_gui, 
 
-    .window_title  = "Nikola Project Template", 
-    .window_width  = 1280, 
-    .window_height = 720, 
+    .window_title  = "Code name - Epona", 
+    .window_width  = 1600, 
+    .window_height = 900, 
     .window_flags  = win_flags,
 
     .args_values = argv, 

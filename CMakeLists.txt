@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(NikolaProjectTemplate) # @TODO: Change the name of your project from here
+project(epona)
 
 ### FetchContent ###
 ############################################################
@@ -35,6 +35,7 @@ set(PROJECT_INCLUDES
   ${PROJECT_LIBS_DIR}
   
   ${nikola_SOURCE_DIR}/nikola/include
+  ${nikola_SOURCE_DIR}/libs
   ${glfw_SOURCE_DIR}/include
   ${glm_SOURCE_DIR}
 )
@@ -50,9 +51,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ### Project sources ###
 ############################################################
 set(PROJECT_SOURCES
-  # Core
   ${PROJECT_SRC_DIR}/app.cpp
   ${PROJECT_SRC_DIR}/main.cpp
+
+  ${PROJECT_SRC_DIR}/utils.cpp
+  ${PROJECT_SRC_DIR}/dice.cpp
+  ${PROJECT_SRC_DIR}/turn.cpp
+  ${PROJECT_SRC_DIR}/rulebook.cpp
 )
 ############################################################
 
@@ -71,6 +76,9 @@ add_executable(${PROJECT_NAME} ${EXE_TYPE} ${PROJECT_SOURCES})
 ############################################################
 target_include_directories(${PROJECT_NAME} PUBLIC BEFORE ${PROJECT_INCLUDES})
 target_link_libraries(${PROJECT_NAME} PUBLIC nikola)
+target_precompile_headers(${PROJECT_NAME} PRIVATE 
+  "$<$<COMPILE_LANGUAGE:CXX>:${nikola_SOURCE_DIR}/nikola/include/nikola/nikola.h>"
+)
 ############################################################
 
 ### Compiling options ###
