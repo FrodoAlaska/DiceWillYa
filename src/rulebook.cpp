@@ -13,8 +13,8 @@ static RuleEvalFunc s_rules[RULES_MAX];
 /// ----------------------------------------------------------------------
 /// Callbacks
 
-static const int accumulate_kinds(const nikola::i32* values, const nikola::sizei values_count, const nikola::u32 kind) {
-  int count = 0;
+static const nikola::i32 accumulate_kinds(const nikola::i32* values, const nikola::sizei values_count, const nikola::u32 kind) {
+  nikola::i32 count = 0;
 
   for(nikola::sizei i = 0; i < values_count; i++) {
     if(values[i] == kind) {
@@ -25,8 +25,8 @@ static const int accumulate_kinds(const nikola::i32* values, const nikola::sizei
   return count;
 }
 
-static const int ones(const nikola::i32* values, const nikola::sizei values_count) {
-  int count = accumulate_kinds(values, values_count, 1);
+static const nikola::i32 ones(const nikola::i32* values, const nikola::sizei values_count) {
+  nikola::i32 count = accumulate_kinds(values, values_count, 1);
 
   switch(count) {
     case 0:
@@ -43,8 +43,8 @@ static const int ones(const nikola::i32* values, const nikola::sizei values_coun
   }
 }
 
-static const int twos(const nikola::i32* values, const nikola::sizei values_count) {
-  int count = accumulate_kinds(values, values_count, 2);
+static const nikola::i32 twos(const nikola::i32* values, const nikola::sizei values_count) {
+  nikola::i32 count = accumulate_kinds(values, values_count, 2);
 
   switch(count) {
     case 1:
@@ -63,8 +63,8 @@ static const int twos(const nikola::i32* values, const nikola::sizei values_coun
   }
 }
 
-static const int threes(const nikola::i32* values, const nikola::sizei values_count) {
-  int count = accumulate_kinds(values, values_count, 3);
+static const nikola::i32 threes(const nikola::i32* values, const nikola::sizei values_count) {
+  nikola::i32 count = accumulate_kinds(values, values_count, 3);
 
   switch(count) {
     case 1:
@@ -83,8 +83,8 @@ static const int threes(const nikola::i32* values, const nikola::sizei values_co
   }
 }
 
-static const int fours(const nikola::i32* values, const nikola::sizei values_count) {
-  int count = accumulate_kinds(values, values_count, 4);
+static const nikola::i32 fours(const nikola::i32* values, const nikola::sizei values_count) {
+  nikola::i32 count = accumulate_kinds(values, values_count, 4);
 
   switch(count) {
     case 1:
@@ -103,8 +103,8 @@ static const int fours(const nikola::i32* values, const nikola::sizei values_cou
   }
 }
 
-static const int fives(const nikola::i32* values, const nikola::sizei values_count) {
-  int count = accumulate_kinds(values, values_count, 5);
+static const nikola::i32 fives(const nikola::i32* values, const nikola::sizei values_count) {
+  nikola::i32 count = accumulate_kinds(values, values_count, 5);
 
   switch(count) {
     case 0:
@@ -122,8 +122,8 @@ static const int fives(const nikola::i32* values, const nikola::sizei values_cou
   }
 }
 
-static const int sixes(const nikola::i32* values, const nikola::sizei values_count) {
-  int count = accumulate_kinds(values, values_count, 6);
+static const nikola::i32 sixes(const nikola::i32* values, const nikola::sizei values_count) {
+  nikola::i32 count = accumulate_kinds(values, values_count, 6);
 
   switch(count) {
     case 1:
@@ -142,7 +142,24 @@ static const int sixes(const nikola::i32* values, const nikola::sizei values_cou
   }
 }
 
-static const int run_sequence(const nikola::i32* values, const nikola::sizei values_count) {
+static const nikola::i32 three_pairs(const nikola::i32* values, const nikola::sizei values_count) {
+  if(values_count <= 0) {
+    return 0;
+  }
+
+  nikola::u32 pairs_count = 0;
+
+  for(nikola::u32 i = 1; i <= DICES_MAX; i++) {
+    nikola::i32 count = accumulate_kinds(values, values_count, i);
+    if(count == 2) {
+      pairs_count++;
+    }
+  }
+
+  return (pairs_count >= 3) ? 1500 : 0;
+}
+
+static const nikola::i32 run_sequence(const nikola::i32* values, const nikola::sizei values_count) {
   if(values_count <= 0) {
     return 0;
   }
@@ -181,7 +198,9 @@ void rulebook_init() {
   s_rules[3] = fours;
   s_rules[4] = fives;
   s_rules[5] = sixes;
-  s_rules[6] = run_sequence;
+  
+  s_rules[6] = three_pairs;
+  s_rules[7] = run_sequence;
 }
 
 const nikola::i32 rulebook_evaluate_active(Dice* dices) {
@@ -221,15 +240,24 @@ const nikola::i32 rulebook_evaluate_selected(Dice* dices) {
     }
   }
 
-  // Accumulate the results
+  // Accumulate the results for a non-full hand selection
 
-  for(nikola::sizei i = 0; i < RULES_MAX; i++) {
+  for(nikola::sizei i = 0; i < RULES_MAX - 2; i++) {
     nikola::i32 res = s_rules[i](selected_values, values_count);
     if(res == -1) { // An invalid or incompatible value found
-      return 0;
+      eval_res = 0;
+      break;
     }
  
     eval_res += res;
+  }
+
+  // Accumulate the results for a FULL hand selection
+
+  if(values_count == DICES_MAX) {
+    for(nikola::sizei i = 6; i < RULES_MAX; i++) {
+      eval_res += s_rules[i](selected_values, values_count);
+    }
   }
 
   return eval_res;

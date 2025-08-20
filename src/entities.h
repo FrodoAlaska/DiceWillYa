@@ -6,7 +6,7 @@
 /// Consts
 
 const nikola::sizei DICES_MAX = 6;
-const nikola::sizei RULES_MAX = 7;
+const nikola::sizei RULES_MAX = 8;
 
 /// Consts
 /// ----------------------------------------------------------------------

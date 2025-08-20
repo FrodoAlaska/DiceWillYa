@@ -1,6 +1,6 @@
 # TODO 
 
-- Two more rules. Three pairs and sequence run
+- You need to play a bunch of games like this in order to know what to do next...
 
 # Design Ideas
 
