@@ -36,6 +36,8 @@ struct Turn {
   nikola::u32 points          = 0; 
   nikola::u32 unbanked_points = 0;
   nikola::u32 eval_points     = 0;
+  
+  nikola::u32 continues = 1;
 
   nikola::i32 dices_count = DICES_MAX;
 

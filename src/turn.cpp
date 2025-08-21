@@ -34,6 +34,7 @@ void turn_reset(Turn& turn) {
   turn.points          = 0;
   turn.unbanked_points = 0;  
   turn.eval_points     = 0; 
+  turn.continues       = 1;
 
   turn.is_farkle   = false; 
   turn.dices_count = DICES_MAX;
@@ -125,6 +126,8 @@ void turn_continue(Turn& turn) {
     dice_toggle_select(turn.dices[i], false);
   }
 
+  turn.continues++;
+
   // Guess if the next turn is going to be a farkle or not
   if(turn.dices_count > 0) {
     turn_start(turn);
@@ -146,9 +149,10 @@ void turn_bank(Turn& turn) {
 
   // Bank the points otherwise
 
-  turn.points          += (turn.unbanked_points + turn.eval_points);
+  turn.points          += (turn.unbanked_points + turn.eval_points) * turn.continues;
   turn.unbanked_points = 0;  
   turn.eval_points     = 0; 
+  turn.continues       = 1;
 
   turn.dices_count = DICES_MAX;
 
