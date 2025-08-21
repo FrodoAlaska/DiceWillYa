@@ -8,10 +8,10 @@
 void dice_create(Dice* out_dice, const nikola::Vec3 start_pos) {
   out_dice->initial_pos = start_pos;
   out_dice->value       = nikola::random_i32(1, DICES_MAX);
-  nikola::Vec4 rot      = get_rotation_from_value(out_dice->value);
+  out_dice->rotation    = get_rotation_from_value(out_dice->value);
 
   nikola::transform_translate(out_dice->transform, out_dice->initial_pos);
-  nikola::transform_rotate(out_dice->transform, rot);
+  nikola::transform_rotate(out_dice->transform, out_dice->rotation);
   nikola::transform_scale(out_dice->transform, nikola::Vec3(8.0f));
 }
 
@@ -19,9 +19,9 @@ void dice_reset(Dice& dice) {
   dice.is_active   = true; 
   dice.is_selected = false;
   dice.value       = nikola::random_i32(1, DICES_MAX);
+  dice.rotation    = get_rotation_from_value(dice.value);
 
   nikola::transform_translate(dice.transform, dice.initial_pos);
-  nikola::transform_rotate(dice.transform, get_rotation_from_value(dice.value));
 }
 
 void dice_update(Dice& dice, const nikola::f32 dt) {
@@ -36,6 +36,7 @@ void dice_update(Dice& dice, const nikola::f32 dt) {
   }
 
   nikola::transform_lerp_position(dice.transform, dest_pos, dt * 5.1f);
+  nikola::transform_lerp_rotation(dice.transform, nikola::Vec3(dice.rotation), dice.rotation.w, dt * 5.1f);
 }
 
 const bool dice_try_discard(Dice& dice) {
@@ -63,10 +64,9 @@ void dice_roll(Dice& dice) {
   dice.value                = nikola::random_i32(1, DICES_MAX);
   dice.is_selected          = false;
   dice.transform.position.y = -3.0f;
-  nikola::Vec4 rot          = get_rotation_from_value(dice.value);
+  dice.rotation             = get_rotation_from_value(dice.value);
 
   nikola::transform_translate(dice.transform, dice.transform.position);
-  nikola::transform_rotate(dice.transform, rot);
 }
 
 /// Dice functions

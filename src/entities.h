@@ -17,6 +17,7 @@ const nikola::sizei ROLLS_MAX = 5;
 struct Dice {
   nikola::Transform transform; 
   nikola::Vec3 initial_pos;
+  nikola::Vec4 rotation;
 
   nikola::i32 value = 0;
 
