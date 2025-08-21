@@ -4,14 +4,6 @@
 
 # Beautify For Playtesters
 
-- Get a better background 
-
-- Rotation animation 
-
-- Better UI layout 
-
-- Some text pop-ups for when banking the turn, continuing the turn, and so on 
-
 - Sound effects for...
     - Choosing a die 
     - Rolling the dice 
@@ -23,13 +15,12 @@
     - Moving the cursor
     - Background music?
 
+- Get a better background 
+- Better UI layout 
+- Some text pop-ups for when banking the turn, continuing the turn, and so on 
 - A menu screen for instructions... or maybe a tutorial mode? 
 
-- A main menu screen specifically for playtesters, allowing them to give their opinions on the game 
-
 # Design Ideas
-
-- End turn and end game? How will that work with a single player? Lose 100 points when there's a farkle? Tournament? 
 
 - High score mode? (Probably should be the default until we can make sure this game is _actually_ fun)
 
