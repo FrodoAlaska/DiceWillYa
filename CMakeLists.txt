@@ -59,7 +59,7 @@ set(PROJECT_SOURCES
   ${PROJECT_SRC_DIR}/turn.cpp
   ${PROJECT_SRC_DIR}/rulebook.cpp
   
-  ${PROJECT_SRC_DIR}/game_event.cpp
+  ${PROJECT_SRC_DIR}/resource_database.cpp
 )
 ############################################################
 

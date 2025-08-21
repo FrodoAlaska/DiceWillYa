@@ -1,5 +1,6 @@
 #include "app.h"
 #include "entities.h"
+#include "resource_database.h"
 
 #include <nikola/nikola_pch.h>
 #include <imgui/imgui.h>
@@ -14,7 +15,6 @@ struct nikola::App {
 
   // Resources
 
-  nikola::HashMap<nikola::String, nikola::ResourceID> resources;
   nikola::ResourceGroupID resource_group;
 
   // Gameplay state
@@ -39,38 +39,13 @@ struct nikola::App {
 static void init_resources(nikola::App* app) {
   // Resource group init
   
-  nikola::FilePath res_path = nikola::filepath_append(nikola::filesystem_current_path(), "res");
-  app->resource_group       = nikola::resources_create_group("app_res", res_path);
+  app->resource_group = nikola::resources_create_group("app_res", "./");
+  nikola::resources_push_dir(app->resource_group, "res");
+
+  resource_database_init(app->resource_group);
 
   // Skybox init
-  app->frame.skybox_id = nikola::resources_push_skybox(app->resource_group, "corona.nbr");
-
-  // Materials init
-
-  nikola::MaterialDesc mat_desc = {
-    .diffuse_id = nikola::resources_push_texture(app->resource_group, "brickwall.nbr"),
-    .normal_id  = nikola::resources_push_texture(app->resource_group, "brickwall_normal.nbr"),
-  };
-  app->resources["brick_material"] = nikola::resources_push_material(app->resource_group, mat_desc);
-
-  mat_desc = {
-    .color        = nikola::Vec3(1.0f, 1.0f, 0.0f),
-    .transparency = 0.2f,
-    .depth_mask   = false,
-  };
-  app->resources["transparent_material"] = nikola::resources_push_material(app->resource_group, mat_desc);
-
-  // Meshes init
-
-  app->resources["cube_mesh"] = nikola::resources_push_mesh(app->resource_group, nikola::GEOMETRY_CUBE);
-
-  // Models init
-  
-  app->resources["dice"] = nikola::resources_push_model(app->resource_group, "dice.nbr");
-
-  // Fonts init
-  
-  app->resources["master_font"] = nikola::resources_push_font(app->resource_group, "Kleader.nbr");
+  app->frame.skybox_id = resource_database_get(RESOURCE_SKYBOX);
 }
 
 /// Private functions
@@ -87,6 +62,7 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   app->window = window;
 
   // Camera init
+  
   nikola::CameraDesc cam_desc = {
     .position     = nikola::Vec3(10.0f, 16.0f, 1.0f),
     .target       = nikola::Vec3(-3.0f, 16.0f, 0.0f),
@@ -202,24 +178,27 @@ static nikola::Vec2 s_pos = nikola::Vec2(500.0f, 280.0f);
 void app_render(nikola::App* app) {
   nikola::renderer_begin(app->frame);
 
+  nikola::ResourceID cube_id = resource_database_get(RESOURCE_CUBE);
+
   // Plane
-  nikola::renderer_queue_mesh(app->resources["cube_mesh"], app->plane, app->resources["brick_material"]);
+  nikola::renderer_queue_mesh(cube_id, app->plane, resource_database_get(RESOURCE_MATERIAL_PLANE));
  
   // Dices 
 
+  nikola::ResourceID dice_id = resource_database_get(RESOURCE_DICE);
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
-    nikola::renderer_queue_model(app->resources["dice"], app->current_turn->dices[i].transform);
+    nikola::renderer_queue_model(dice_id, app->current_turn->dices[i].transform);
   }
 
   // Cursor
-  nikola::renderer_queue_mesh(app->resources["cube_mesh"], app->current_turn->cursor, app->resources["transparent_material"]);
+  nikola::renderer_queue_mesh(cube_id, app->current_turn->cursor, resource_database_get(RESOURCE_MATERIAL_TRANSPARENT));
 
   nikola::renderer_end();
 
   // UI
 
   nikola::batch_renderer_begin();
-  nikola::Font* font = nikola::resources_get_font(app->resources["master_font"]);
+  nikola::Font* font = nikola::resources_get_font(resource_database_get(RESOURCE_FONT));
    
   if(!app->current_turn->is_farkle) {
     // Instructions

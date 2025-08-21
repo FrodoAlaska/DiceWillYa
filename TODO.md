@@ -4,6 +4,8 @@
 
 # Beautify For Playtesters
 
+- Audio manager
+
 - Sound effects for...
     - Choosing a die 
     - Rolling the dice 
