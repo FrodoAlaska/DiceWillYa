@@ -38,6 +38,8 @@ void turn_reset(Turn& turn) {
 
   turn.is_farkle   = false; 
   turn.dices_count = DICES_MAX;
+
+  turn.rolls_count = ROLLS_MAX;
 }
 
 void turn_process_input(Turn& turn) {
@@ -99,7 +101,7 @@ void turn_start(Turn& turn) {
 void turn_continue(Turn& turn) {
   // We have to check for a valid evaluation first
 
-  if(turn.eval_points == 0) {
+  if(turn.eval_points <= 0) {
     // De-select the currently selected dice
     
     for(nikola::sizei i = 0; i < DICES_MAX; i++) {
@@ -137,7 +139,7 @@ void turn_continue(Turn& turn) {
 void turn_bank(Turn& turn) {
   // We have to check for a valid evaluation first
 
-  if(turn.eval_points == 0) {
+  if(turn.eval_points <= 0) {
     // De-select the currently selected dice
     
     for(nikola::sizei i = 0; i < DICES_MAX; i++) {
@@ -155,6 +157,7 @@ void turn_bank(Turn& turn) {
   turn.continues       = 1;
 
   turn.dices_count = DICES_MAX;
+  turn.rolls_count = ROLLS_MAX;
 
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
     dice_reset(turn.dices[i]);

@@ -155,14 +155,28 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
   // Restart turn
   
   if(app->current_turn->is_farkle && nikola::input_key_pressed(nikola::KEY_R)) {
+    nikola::i32 old_points = app->current_turn->points; 
+    old_points            /= 2;
+
+    if(old_points < 0) {
+      old_points = 0;
+    }
+
     turn_reset(*app->current_turn);
+    app->current_turn->points = old_points;
+
     return;
   }
 
   // Start turn
 
-  if(nikola::input_key_pressed(nikola::KEY_R)) {
+  if(app->current_turn->rolls_count > 0 && nikola::input_key_pressed(nikola::KEY_R)) {
     turn_start(*app->current_turn);
+
+    app->current_turn->rolls_count--;
+    if(app->current_turn->rolls_count < 0) {
+      app->current_turn->rolls_count = 0;
+    }
   }
 
   // Continue turn 
@@ -212,7 +226,11 @@ void app_render(nikola::App* app) {
 
     nikola::batch_render_text(font, "C      - Continue turn", nikola::Vec2(20.0f, 32.0f), 24.0f, nikola::Vec4(1.0f));
     nikola::batch_render_text(font, "B      - Bank the points", nikola::Vec2(20.0f, 56.0f), 24.0f, nikola::Vec4(1.0f));
-    nikola::batch_render_text(font, "R      -  Re-roll", nikola::Vec2(20.0f, 80.0f), 24.0f, nikola::Vec4(1.0f));
+    nikola::batch_render_text(font, 
+                              "R      - Re-roll (Rolls: " + std::to_string(app->current_turn->rolls_count) + ")", 
+                              nikola::Vec2(20.0f, 80.0f), 
+                              24.0f, 
+                              nikola::Vec4(1.0f));
     nikola::batch_render_text(font, "ARROWS - Move", nikola::Vec2(20.0f, 104.0f), 24.0f, nikola::Vec4(1.0f));
     nikola::batch_render_text(font, "SPACE  - Select dice", nikola::Vec2(20.0f, 128.0f), 24.0f, nikola::Vec4(1.0f));
 

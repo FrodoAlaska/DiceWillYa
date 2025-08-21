@@ -7,6 +7,7 @@
 
 const nikola::sizei DICES_MAX = 6;
 const nikola::sizei RULES_MAX = 8;
+const nikola::sizei ROLLS_MAX = 5;
 
 /// Consts
 /// ----------------------------------------------------------------------
@@ -33,13 +34,14 @@ struct Turn {
 
   nikola::u32 dice_cursor = 0;
 
-  nikola::u32 points          = 0; 
-  nikola::u32 unbanked_points = 0;
-  nikola::u32 eval_points     = 0;
+  nikola::i32 points          = 0; 
+  nikola::i32 unbanked_points = 0;
+  nikola::i32 eval_points     = 0;
   
   nikola::u32 continues = 1;
 
   nikola::i32 dices_count = DICES_MAX;
+  nikola::i32 rolls_count = ROLLS_MAX;
 
   bool is_farkle = false;
 };

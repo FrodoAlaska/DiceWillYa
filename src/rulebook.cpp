@@ -156,7 +156,7 @@ static const nikola::i32 three_pairs(const nikola::i32* values, const nikola::si
     }
   }
 
-  return (pairs_count >= 3) ? 1500 : 0;
+  return (pairs_count == 3) ? 1500 : 0;
 }
 
 static const nikola::i32 run_sequence(const nikola::i32* values, const nikola::sizei values_count) {

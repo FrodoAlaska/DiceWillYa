@@ -2,8 +2,6 @@
 
 - You need to play a bunch of games like this in order to know what to do next...
 
-- A state manager 
-
 # Beautify For Playtesters
 
 - Get a better background 
