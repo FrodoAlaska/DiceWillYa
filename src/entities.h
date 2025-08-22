@@ -33,7 +33,7 @@ struct Turn {
   Dice dices[DICES_MAX];
   nikola::Transform cursor;
 
-  nikola::u32 dice_cursor = 0;
+  nikola::i32 dice_cursor = 0;
 
   nikola::i32 points          = 0; 
   nikola::i32 unbanked_points = 0;

@@ -55,7 +55,14 @@ void turn_process_input(Turn& turn) {
     turn.dice_cursor++;
   }
  
-  turn.dice_cursor = nikola::clamp_int(turn.dice_cursor, 0, DICES_MAX - 1); 
+  // Make the cursor wrap around the ends
+
+  if(turn.dice_cursor < 0) {
+    turn.dice_cursor = DICES_MAX - 1;
+  }
+  else if(turn.dice_cursor >= DICES_MAX) {
+    turn.dice_cursor = 0;
+  }
 
   // Set the cursor's position to the currently selected dice (if it's active.
 

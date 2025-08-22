@@ -4,8 +4,6 @@
 
 # Beautify For Playtesters
 
-- Make the cursor wrap around 
-
 - Sound effects for...
     [] Background music?
 
