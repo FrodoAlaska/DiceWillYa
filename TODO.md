@@ -4,18 +4,10 @@
 
 # Beautify For Playtesters
 
-- Audio manager
+- Make the cursor wrap around 
 
 - Sound effects for...
-    - Choosing a die 
-    - Rolling the dice 
-    - Getting a farkle 
-    - Getting a banking combo 
-    - Banking 
-    - Invalid combination of dice 
-    - Invalid input 
-    - Moving the cursor
-    - Background music?
+    [] Background music?
 
 - Get a better background 
 - Better UI layout 

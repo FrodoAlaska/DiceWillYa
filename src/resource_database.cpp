@@ -40,6 +40,17 @@ void resource_database_init(const nikola::ResourceGroupID& group_id) {
   };
   s_database.resources[RESOURCE_MATERIAL_TRANSPARENT] = nikola::resources_push_material(group_id, mat_desc);
 
+  // Audio init
+
+  s_database.resources[RESOURCE_SOUND_DICE_CHOOSE]   = nikola::resources_get_id(group_id, "dice_choose");
+  s_database.resources[RESOURCE_SOUND_DICE_INVALID]  = nikola::resources_get_id(group_id, "dice_invalid");
+  s_database.resources[RESOURCE_SOUND_DICE_ROLL]     = nikola::resources_get_id(group_id, "dice_throw");
+  s_database.resources[RESOURCE_SOUND_DICE_COMPLETE] = nikola::resources_get_id(group_id, "dice_complete");
+  
+  s_database.resources[RESOURCE_SOUND_BANKING]    = nikola::resources_get_id(group_id, "banking_multiplier");
+  s_database.resources[RESOURCE_SOUND_COMBO_BANK] = nikola::resources_get_id(group_id, "banking");
+  s_database.resources[RESOURCE_SOUND_FARKLED]    = nikola::resources_get_id(group_id, "farkle");
+
   // Models init
   s_database.resources[RESOURCE_DICE] = nikola::resources_get_id(group_id, "dice");
 

@@ -1,6 +1,7 @@
 #include "app.h"
 #include "entities.h"
 #include "resource_database.h"
+#include "sound_manager.h"
 
 #include <nikola/nikola_pch.h>
 #include <imgui/imgui.h>
@@ -34,24 +35,6 @@ struct nikola::App {
 /// ----------------------------------------------------------------------
 
 /// ----------------------------------------------------------------------
-/// Private functions
-
-static void init_resources(nikola::App* app) {
-  // Resource group init
-  
-  app->resource_group = nikola::resources_create_group("app_res", "./");
-  nikola::resources_push_dir(app->resource_group, "res");
-
-  resource_database_init(app->resource_group);
-
-  // Skybox init
-  app->frame.skybox_id = resource_database_get(RESOURCE_SKYBOX);
-}
-
-/// Private functions
-/// ----------------------------------------------------------------------
-
-/// ----------------------------------------------------------------------
 /// App functions 
 
 nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
@@ -79,12 +62,22 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   nikola::gui_init(window);
 
   // Resources init
-  init_resources(app);
+  
+  app->resource_group = nikola::resources_create_group("app_res", "./");
+  nikola::resources_push_dir(app->resource_group, "res");
+
+  resource_database_init(app->resource_group);
+
+  // Skybox init
+  app->frame.skybox_id = resource_database_get(RESOURCE_SKYBOX);
 
   // Lights init
 
   app->frame.dir_light.direction = nikola::Vec3(1.0f, -1.0f, 1.0f);
   app->frame.ambient             = nikola::Vec3(1.0f);
+
+  // Sound manager init
+  sound_manager_init();
 
   // Rules init
   rulebook_init();
@@ -103,9 +96,10 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
 }
 
 void app_shutdown(nikola::App* app) {
-  // @TEMP
-  // nikola::gui_shutdown();
-  // delete app;
+  sound_manager_shutdown();
+
+  nikola::gui_shutdown();
+  delete app;
 }
 
 void app_update(nikola::App* app, const nikola::f64 delta_time) {

@@ -5,7 +5,7 @@
 int main(int argc, char** argv) {
   // Some useful flags
   int win_flags = nikola::WINDOW_FLAGS_FOCUS_ON_CREATE | 
-                  nikola::WINDOW_FLAGS_FULLSCREEN      |
+                  //nikola::WINDOW_FLAGS_FULLSCREEN      |
                   nikola::WINDOW_FLAGS_CENTER_MOUSE;
   
   // App init

@@ -204,7 +204,7 @@ void rulebook_init() {
 }
 
 const nikola::i32 rulebook_evaluate_active(Dice* dices) {
-  nikola::i32 res = 0; 
+  nikola::i32 eval_res = 0; 
 
   // Gather the active dices
 
@@ -220,10 +220,15 @@ const nikola::i32 rulebook_evaluate_active(Dice* dices) {
   // Accumulate the results
 
   for(nikola::sizei i = 0; i < RULES_MAX; i++) {
-    res += s_rules[i](active_values, values_count);
+    nikola::i32 res = s_rules[i](active_values, values_count);
+    if(res == -1) {
+      continue;
+    }
+
+    eval_res += res;
   }
 
-  return res;
+  return eval_res;
 }
 
 const nikola::i32 rulebook_evaluate_selected(Dice* dices) {

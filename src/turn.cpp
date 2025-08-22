@@ -1,4 +1,5 @@
 #include "entities.h"
+#include "sound_manager.h"
 
 #include <nikola/nikola_pch.h>
 
@@ -40,6 +41,8 @@ void turn_reset(Turn& turn) {
   turn.dices_count = DICES_MAX;
 
   turn.rolls_count = ROLLS_MAX;
+
+  turn_start(turn);
 }
 
 void turn_process_input(Turn& turn) {
@@ -51,7 +54,7 @@ void turn_process_input(Turn& turn) {
   else if(nikola::input_key_pressed(nikola::KEY_RIGHT)) {
     turn.dice_cursor++;
   }
-  
+ 
   turn.dice_cursor = nikola::clamp_int(turn.dice_cursor, 0, DICES_MAX - 1); 
 
   // Set the cursor's position to the currently selected dice (if it's active.
@@ -64,6 +67,7 @@ void turn_process_input(Turn& turn) {
   // Select the dice
   
   if(nikola::input_key_pressed(nikola::KEY_SPACE)) {
+    sound_manager_play(SOUND_DICE_CHOOSE);
     dice_toggle_select(*dice, !dice->is_selected);
   } 
 }
@@ -86,6 +90,7 @@ void turn_update(Turn& turn, const nikola::f32 dt) {
       dice_reset(turn.dices[i]);
       dice_roll(turn.dices[i]); 
     }
+    sound_manager_play(SOUND_DICE_COMPLETE);
   }
 }
 
@@ -93,9 +98,14 @@ void turn_start(Turn& turn) {
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
     dice_roll(turn.dices[i]);
   }
+  sound_manager_play(SOUND_DICE_ROLL);
 
   nikola::i32 eval_res = rulebook_evaluate_active(turn.dices);
   turn.is_farkle       = (eval_res <= 0);
+
+  if(turn.is_farkle) {
+    sound_manager_play(SOUND_FARKLED);
+  }
 }
 
 void turn_continue(Turn& turn) {
@@ -108,6 +118,7 @@ void turn_continue(Turn& turn) {
       dice_toggle_select(turn.dices[i], false);
     }
 
+    sound_manager_play(SOUND_DICE_INVALID);
     return;
   } 
 
@@ -129,6 +140,7 @@ void turn_continue(Turn& turn) {
   }
 
   turn.continues++;
+  sound_manager_play(SOUND_COMBO_BANK); 
 
   // Guess if the next turn is going to be a farkle or not
   if(turn.dices_count > 0) {
@@ -146,6 +158,7 @@ void turn_bank(Turn& turn) {
       dice_toggle_select(turn.dices[i], false);
     }
 
+    sound_manager_play(SOUND_DICE_INVALID);
     return;
   } 
 
@@ -159,11 +172,13 @@ void turn_bank(Turn& turn) {
   turn.dices_count = DICES_MAX;
   turn.rolls_count = ROLLS_MAX;
 
+  sound_manager_play(SOUND_BANKING);
+
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
     dice_reset(turn.dices[i]);
   } 
 
-  turn_bank(turn);
+  turn_start(turn);
 }
 
 /// Turn functions
