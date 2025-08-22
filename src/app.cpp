@@ -58,15 +58,15 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   app->frame.camera.yaw   = -89.4f; 
   app->frame.camera.pitch = -84.0f; 
 
-  // GUI init
-  nikola::gui_init(window);
-
   // Resources init
   
   app->resource_group = nikola::resources_create_group("app_res", "./");
   nikola::resources_push_dir(app->resource_group, "res");
 
   resource_database_init(app->resource_group);
+
+  // GUI init
+  nikola::gui_init(window);
 
   // Skybox init
   app->frame.skybox_id = resource_database_get(RESOURCE_SKYBOX);
@@ -99,6 +99,8 @@ void app_shutdown(nikola::App* app) {
   sound_manager_shutdown();
 
   nikola::gui_shutdown();
+  nikola::resources_destroy_group(app->resource_group); 
+
   delete app;
 }
 

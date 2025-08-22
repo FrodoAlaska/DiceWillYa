@@ -25,6 +25,8 @@ void turn_create(Turn* out_turn) {
 
   // Roll the dice and start an early turn
   turn_start(*out_turn);
+
+  sound_manager_play(SOUND_MUSIC1);
 }
 
 void turn_reset(Turn& turn) {

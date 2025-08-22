@@ -4,9 +4,6 @@
 
 # Beautify For Playtesters
 
-- Sound effects for...
-    [] Background music?
-
 - Get a better background 
 - Better UI layout 
 - Some text pop-ups for when banking the turn, continuing the turn, and so on 
