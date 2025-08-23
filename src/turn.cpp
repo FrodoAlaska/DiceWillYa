@@ -26,7 +26,8 @@ void turn_create(Turn* out_turn) {
   // Roll the dice and start an early turn
   turn_start(*out_turn);
 
-  sound_manager_play(SOUND_MUSIC1);
+  nikola::u32 random_music = nikola::random_u32(SOUND_MUSIC1, SOUND_MUSIC4);
+  sound_manager_play((SoundType)random_music);
 }
 
 void turn_reset(Turn& turn) {
@@ -76,7 +77,9 @@ void turn_process_input(Turn& turn) {
   // Select the dice
   
   if(nikola::input_key_pressed(nikola::KEY_SPACE)) {
-    sound_manager_play(SOUND_DICE_CHOOSE);
+    nikola::f32 random_pitch = nikola::random_f32(0.8f, 1.0f);
+    sound_manager_play(SOUND_DICE_CHOOSE, random_pitch);
+
     dice_toggle_select(*dice, !dice->is_selected);
   } 
 }

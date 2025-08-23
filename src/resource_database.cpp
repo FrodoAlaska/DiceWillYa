@@ -56,11 +56,13 @@ void resource_database_init(const nikola::ResourceGroupID& group_id) {
   s_database.resources[RESOURCE_MUSIC3] = nikola::resources_get_id(group_id, "music_3_minstrel_dance");
   s_database.resources[RESOURCE_MUSIC4] = nikola::resources_get_id(group_id, "music_4_market_day");
 
-  // Models init
-  s_database.resources[RESOURCE_DICE] = nikola::resources_get_id(group_id, "dice");
-
   // Fonts init
   s_database.resources[RESOURCE_FONT] = nikola::resources_get_id(group_id, "Kleader");
+
+  // Models init
+  
+  s_database.resources[RESOURCE_DICE]  = nikola::resources_get_id(group_id, "dice");
+  s_database.resources[RESOURCE_TABLE] = nikola::resources_get_id(group_id, "tavern_table");
 }
 
 const nikola::ResourceID& resource_database_get(const ResourceType type) {

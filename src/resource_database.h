@@ -26,7 +26,9 @@ enum ResourceType {
   RESOURCE_MUSIC4,
 
   RESOURCE_FONT,
+  
   RESOURCE_DICE,
+  RESOURCE_TABLE,
 
   RESOURCES_MAX,
 };

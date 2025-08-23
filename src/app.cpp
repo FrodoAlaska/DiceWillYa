@@ -26,12 +26,59 @@ struct nikola::App {
   // Transforms
 
   nikola::Transform plane;
+
+  // UI
  
+  nikola::UILayout game_hud;
+
   // GUI
 
   bool has_editor = false;
 };
 /// App
+/// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
+/// Private functions
+
+static void init_hud(nikola::App* app) {
+  nikola::ui_layout_create(&app->game_hud, app->window, resource_database_get(RESOURCE_FONT));
+
+  // Instructions 
+
+  nikola::ui_layout_begin(app->game_hud, nikola::UI_ANCHOR_BOTTOM_LEFT, nikola::Vec2(0.0f, -24.0f));
+
+  nikola::Vec4 insts_color = nikola::Vec4(1.0f);
+
+  nikola::ui_layout_push_text(app->game_hud, "C      - Continue turn", 24.0f, insts_color);
+  nikola::ui_layout_push_text(app->game_hud, "B      - Bank the points", 24.0f, insts_color);
+  nikola::ui_layout_push_text(app->game_hud, "R      - Re-roll (Rolls: 0)", 24.0f, insts_color);
+  nikola::ui_layout_push_text(app->game_hud, "ARROWS - Move", 24.0f, insts_color);
+  nikola::ui_layout_push_text(app->game_hud, "SPACE  - Select dice", 24.0f, insts_color);
+
+  nikola::ui_layout_end(app->game_hud);
+
+  // Scores
+  
+  nikola::ui_layout_begin(app->game_hud, nikola::UI_ANCHOR_TOP_LEFT, nikola::Vec2(0.0f, 24.0f));
+
+  nikola::ui_layout_push_text(app->game_hud, "Turn points:     0", 24.0f, nikola::Vec4(1.0f));
+  nikola::ui_layout_push_text(app->game_hud, "Unbanked points: 0", 24.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  nikola::ui_layout_push_text(app->game_hud, "Banked points:   0", 24.0f, nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+  nikola::ui_layout_end(app->game_hud);
+
+  // Farkle
+  
+  nikola::ui_layout_begin(app->game_hud, nikola::UI_ANCHOR_CENTER);
+  
+  nikola::ui_layout_push_text(app->game_hud, "FARKLED!", 48.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  app->game_hud.texts[8].is_active = false; 
+
+  nikola::ui_layout_end(app->game_hud);
+}
+
+/// Private functions
 /// ----------------------------------------------------------------------
 
 /// ----------------------------------------------------------------------
@@ -86,6 +133,9 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   
   turn_create(&app->player_turn);
   app->current_turn = &app->player_turn;
+
+  // HUD init
+  init_hud(app);
 
   // Transforms init
 
@@ -197,46 +247,27 @@ void app_render(nikola::App* app) {
   nikola::Font* font = nikola::resources_get_font(resource_database_get(RESOURCE_FONT));
    
   if(!app->current_turn->is_farkle) {
-    // Instructions
+    nikola::ui_text_set_string(app->game_hud.texts[2], 
+                               "R      - Re-roll (Rolls: " + std::to_string(app->current_turn->rolls_count) + ")");
 
-    nikola::batch_render_text(font, "C      - Continue turn", nikola::Vec2(20.0f, 32.0f), 24.0f, nikola::Vec4(1.0f));
-    nikola::batch_render_text(font, "B      - Bank the points", nikola::Vec2(20.0f, 56.0f), 24.0f, nikola::Vec4(1.0f));
-    nikola::batch_render_text(font, 
-                              "R      - Re-roll (Rolls: " + std::to_string(app->current_turn->rolls_count) + ")", 
-                              nikola::Vec2(20.0f, 80.0f), 
-                              24.0f, 
-                              nikola::Vec4(1.0f));
-    nikola::batch_render_text(font, "ARROWS - Move", nikola::Vec2(20.0f, 104.0f), 24.0f, nikola::Vec4(1.0f));
-    nikola::batch_render_text(font, "SPACE  - Select dice", nikola::Vec2(20.0f, 128.0f), 24.0f, nikola::Vec4(1.0f));
-
-    // Points
+    nikola::ui_text_set_string(app->game_hud.texts[5], 
+                               "Turn points: " + std::to_string(app->current_turn->eval_points));
     
-    nikola::batch_render_text(font, 
-                              ("Turn points: " + std::to_string(app->current_turn->eval_points)), 
-                              nikola::Vec2(20.0f, 200.0f), 
-                              24.0f, 
-                              nikola::Vec4(1.0f));
+    nikola::ui_text_set_string(app->game_hud.texts[6], 
+                               "Unbanked points: " + std::to_string(app->current_turn->unbanked_points));
     
-    nikola::batch_render_text(font, 
-                              ("Unbanked points: " + std::to_string(app->current_turn->unbanked_points)), 
-                              nikola::Vec2(20.0f, 224.0f), 
-                              24.0f, 
-                              nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-    nikola::batch_render_text(font, 
-                              "Banked points: " + std::to_string(app->current_turn->points), 
-                              nikola::Vec2(20.0f, 248.0f), 
-                              24.0f, 
-                              nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
+    nikola::ui_text_set_string(app->game_hud.texts[7], 
+                               "Banked points: " + std::to_string(app->current_turn->points));
+    
+    app->game_hud.texts[8].is_active = false; // Farkle text 
+    
+    nikola::ui_layout_render(app->game_hud);
   }
   else {
-    // Lost
-
-    if(app->current_turn->is_farkle) {
-      nikola::batch_render_text(font, "FARKLED!!", nikola::Vec2(100.0f, 32.0f), 24.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-      nikola::batch_render_text(font, "R - Restart", nikola::Vec2(100.0f, 56.0f), 24.0f, nikola::Vec4(1.0f));
-    }
+    app->game_hud.texts[8].is_active = true; 
+    
+    nikola::ui_text_apply_animation(app->game_hud.texts[8], nikola::UI_TEXT_ANIMATION_SLIDE_UP, 10.0f);
+    nikola::ui_text_render(app->game_hud.texts[8]);
   }
   
   nikola::batch_renderer_end();

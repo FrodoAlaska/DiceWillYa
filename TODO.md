@@ -8,6 +8,9 @@
 - Better UI layout 
 - Some text pop-ups for when banking the turn, continuing the turn, and so on 
 - A menu screen for instructions... or maybe a tutorial mode? 
+- The main menu is a tavern sign with the game's name?
+
+- Shuffle between the music during gameplay
 
 # Design Ideas
 
