@@ -30,6 +30,7 @@ struct nikola::App {
   // UI
  
   nikola::UILayout game_hud;
+  nikola::UILayout pop_ups;
 
   // GUI
 
@@ -76,6 +77,15 @@ static void init_hud(nikola::App* app) {
   app->game_hud.texts[8].is_active = false; 
 
   nikola::ui_layout_end(app->game_hud);
+
+  // Pop-ups
+
+  nikola::ui_layout_create(&app->pop_ups, app->window, resource_database_get(RESOURCE_FONT));
+  app->pop_ups.is_active = false;
+
+  nikola::ui_layout_begin(app->pop_ups, nikola::UI_ANCHOR_CENTER);
+  nikola::ui_layout_push_text(app->pop_ups, "+100", 42.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f), nikola::Vec2(0.0f, -128.0f));
+  nikola::ui_layout_end(app->pop_ups);
 }
 
 /// Private functions
@@ -176,18 +186,22 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
 
   // Restart turn
   
-  if(app->current_turn->is_farkle && nikola::input_key_pressed(nikola::KEY_R)) {
+  if(app->current_turn->is_farkle) {
     nikola::i32 old_points = app->current_turn->points; 
-    old_points            /= 2;
 
-    if(old_points < 0) {
-      old_points = 0;
+    nikola::ui_text_set_string(app->pop_ups.texts[0], "-" + std::to_string(old_points / 4));
+    app->pop_ups.texts[0].color = nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    
+    app->pop_ups.is_active = true;
+
+    if(nikola::input_key_pressed(nikola::KEY_R)) {
+      turn_reset(*app->current_turn);
+
+      app->current_turn->points  = old_points;
+      app->current_turn->points -= (app->current_turn->points / 4);
+
+      return;
     }
-
-    turn_reset(*app->current_turn);
-    app->current_turn->points = old_points;
-
-    return;
   }
 
   // Start turn
@@ -205,22 +219,39 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
 
   if(nikola::input_key_pressed(nikola::KEY_C)) {
     turn_continue(*app->current_turn);
+    
+    app->pop_ups.is_active = true;
+
+    nikola::ui_text_set_string(app->pop_ups.texts[0], "+" + std::to_string(app->current_turn->eval_points));
+    app->pop_ups.texts[0].color = nikola::Vec4(1.0f, 1.0f, 0.0f, 1.0f);
   }
 
   // Bank turn 
 
   if(nikola::input_key_pressed(nikola::KEY_B)) {
+    nikola::i32 old_points = app->current_turn->points;
+
     turn_bank(*app->current_turn);
+    nikola::i32 points = app->current_turn->points - old_points;
+    
+    app->pop_ups.is_active = true;
+
+    nikola::ui_text_set_string(app->pop_ups.texts[0], "+" + std::to_string(points));
+    app->pop_ups.texts[0].color = nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f);
   }
 
   // Turn update
  
   turn_process_input(*app->current_turn);
   turn_update(*app->current_turn, (nikola::f32)delta_time);
+  
+  // Pop-ups management
+
+  if((app->pop_ups.texts[0].color.a <= 0.1)) {
+    app->pop_ups.is_active = false;
+  }
 }
  
-static nikola::Vec2 s_pos = nikola::Vec2(500.0f, 280.0f);
-
 void app_render(nikola::App* app) {
   nikola::renderer_begin(app->frame);
 
@@ -266,9 +297,13 @@ void app_render(nikola::App* app) {
   else {
     app->game_hud.texts[8].is_active = true; 
     
-    nikola::ui_text_apply_animation(app->game_hud.texts[8], nikola::UI_TEXT_ANIMATION_SLIDE_UP, 10.0f);
+    nikola::ui_text_apply_animation(app->game_hud.texts[8], nikola::UI_TEXT_ANIMATION_FADE_IN, 1.5f);
     nikola::ui_text_render(app->game_hud.texts[8]);
   }
+
+  nikola::ui_text_apply_animation(app->pop_ups.texts[0], nikola::UI_TEXT_ANIMATION_FADE_OUT, 0.8f);
+  nikola::ui_text_apply_animation(app->pop_ups.texts[0], nikola::UI_TEXT_ANIMATION_SLIDE_UP, 30.5f);
+  nikola::ui_layout_render(app->pop_ups);
   
   nikola::batch_renderer_end();
 }
