@@ -23,6 +23,10 @@ struct nikola::App {
   Turn player_turn; 
   Turn* current_turn = nullptr;
 
+  nikola::i32 next_rank_points = 3000;
+  nikola::i32 points_left      = 3000;
+  nikola::u32 current_rank     = 1;
+
   // Transforms
 
   nikola::Transform plane;
@@ -66,6 +70,9 @@ static void init_hud(nikola::App* app) {
   nikola::ui_layout_push_text(app->game_hud, "Turn points:     0", 24.0f, nikola::Vec4(1.0f));
   nikola::ui_layout_push_text(app->game_hud, "Unbanked points: 0", 24.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
   nikola::ui_layout_push_text(app->game_hud, "Banked points:   0", 24.0f, nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+  
+  nikola::ui_layout_push_text(app->game_hud, "Points left: 0", 24.0f, nikola::Vec4(1.0f));
+  nikola::ui_layout_push_text(app->game_hud, "Rank:        0", 24.0f, nikola::Vec4(1.0f));
 
   nikola::ui_layout_end(app->game_hud);
 
@@ -74,7 +81,7 @@ static void init_hud(nikola::App* app) {
   nikola::ui_layout_begin(app->game_hud, nikola::UI_ANCHOR_CENTER);
   
   nikola::ui_layout_push_text(app->game_hud, "FARKLED!", 48.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-  app->game_hud.texts[8].is_active = false; 
+  app->game_hud.texts[10].is_active = false; 
 
   nikola::ui_layout_end(app->game_hud);
 
@@ -86,6 +93,13 @@ static void init_hud(nikola::App* app) {
   nikola::ui_layout_begin(app->pop_ups, nikola::UI_ANCHOR_CENTER);
   nikola::ui_layout_push_text(app->pop_ups, "+100", 42.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f), nikola::Vec2(0.0f, -128.0f));
   nikola::ui_layout_end(app->pop_ups);
+}
+
+static void spawn_pop_up(nikola::App* app, const nikola::String& txt, const nikola::Vec4& color) {
+  app->pop_ups.is_active      = true;
+  app->pop_ups.texts[0].color = color;
+
+  nikola::ui_text_set_string(app->pop_ups.texts[0], txt);
 }
 
 /// Private functions
@@ -187,19 +201,18 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
   // Restart turn
   
   if(app->current_turn->is_farkle) {
-    nikola::i32 old_points = app->current_turn->points; 
+    nikola::i32 old_points  = app->current_turn->points; 
+    nikola::i32 points_lost = (app->current_turn->points / 4);
 
-    nikola::ui_text_set_string(app->pop_ups.texts[0], "-" + std::to_string(old_points / 4));
-    app->pop_ups.texts[0].color = nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    
-    app->pop_ups.is_active = true;
+    spawn_pop_up(app, "-" + std::to_string(points_lost), nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
     if(nikola::input_key_pressed(nikola::KEY_R)) {
       turn_reset(*app->current_turn);
 
       app->current_turn->points  = old_points;
-      app->current_turn->points -= (app->current_turn->points / 4);
+      app->current_turn->points -= points_lost;
 
+      app->points_left += points_lost;
       return;
     }
   }
@@ -219,11 +232,7 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
 
   if(nikola::input_key_pressed(nikola::KEY_C)) {
     turn_continue(*app->current_turn);
-    
-    app->pop_ups.is_active = true;
-
-    nikola::ui_text_set_string(app->pop_ups.texts[0], "+" + std::to_string(app->current_turn->eval_points));
-    app->pop_ups.texts[0].color = nikola::Vec4(1.0f, 1.0f, 0.0f, 1.0f);
+    spawn_pop_up(app, "+" + std::to_string(app->current_turn->eval_points), nikola::Vec4(1.0f, 1.0f, 0.0f, 1.0f));
   }
 
   // Bank turn 
@@ -232,19 +241,46 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
     nikola::i32 old_points = app->current_turn->points;
 
     turn_bank(*app->current_turn);
-    nikola::i32 points = app->current_turn->points - old_points;
-    
-    app->pop_ups.is_active = true;
+    nikola::i32 points_gained = app->current_turn->points - old_points;
 
-    nikola::ui_text_set_string(app->pop_ups.texts[0], "+" + std::to_string(points));
-    app->pop_ups.texts[0].color = nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    spawn_pop_up(app, "+" + std::to_string(points_gained), nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    app->points_left -= points_gained;
   }
 
   // Turn update
  
   turn_process_input(*app->current_turn);
   turn_update(*app->current_turn, (nikola::f32)delta_time);
+ 
+  // Ranking management 
+
+  if(app->points_left <= 0) { // We can level up!
+    app->current_rank++;
+    
+    app->next_rank_points  = app->current_rank * 3000; 
+    app->points_left       = app->next_rank_points;
+
+    spawn_pop_up(app, "RANKED!", nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+  }
+
+  // This is when we have lost so much points that we need 
+  // to drop down a rank. 
+  if(app->points_left > app->next_rank_points) {
+    app->next_rank_points /= 2;
+    if(app->next_rank_points < 3000) { // Better clamp the ranking points to a certain range
+      app->next_rank_points = 3000;
+    }
+    
+    app->points_left = app->next_rank_points;
+    app->current_rank--; 
+  }
   
+  // Clamp the ranking points
+
+  if(app->current_rank <= 0) { // Clamp the rank
+    app->current_rank = 1;
+  } 
+
   // Pop-ups management
 
   if((app->pop_ups.texts[0].color.a <= 0.1)) {
@@ -290,15 +326,21 @@ void app_render(nikola::App* app) {
     nikola::ui_text_set_string(app->game_hud.texts[7], 
                                "Banked points: " + std::to_string(app->current_turn->points));
     
-    app->game_hud.texts[8].is_active = false; // Farkle text 
+    nikola::ui_text_set_string(app->game_hud.texts[8], 
+                               "Points left: " + std::to_string(app->points_left));
+    
+    nikola::ui_text_set_string(app->game_hud.texts[9], 
+                               "Rank: " + std::to_string(app->current_rank));
+    
+    app->game_hud.texts[10].is_active = false; // Farkle text 
     
     nikola::ui_layout_render(app->game_hud);
   }
   else {
-    app->game_hud.texts[8].is_active = true; 
+    app->game_hud.texts[10].is_active = true; 
     
-    nikola::ui_text_apply_animation(app->game_hud.texts[8], nikola::UI_TEXT_ANIMATION_FADE_IN, 1.5f);
-    nikola::ui_text_render(app->game_hud.texts[8]);
+    nikola::ui_text_apply_animation(app->game_hud.texts[10], nikola::UI_TEXT_ANIMATION_FADE_IN, 1.5f);
+    nikola::ui_text_render(app->game_hud.texts[10]);
   }
 
   nikola::ui_text_apply_animation(app->pop_ups.texts[0], nikola::UI_TEXT_ANIMATION_FADE_OUT, 0.8f);
