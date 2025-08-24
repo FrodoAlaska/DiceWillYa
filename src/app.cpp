@@ -24,7 +24,6 @@ struct nikola::App {
   Turn* current_turn = nullptr;
 
   nikola::i32 next_rank_points = 3000;
-  nikola::i32 points_left      = 3000;
   nikola::u32 current_rank     = 1;
 
   // Transforms
@@ -198,55 +197,6 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
   // Update the camera
   nikola::camera_update(app->frame.camera);
 
-  // Restart turn
-  
-  if(app->current_turn->is_farkle) {
-    nikola::i32 old_points  = app->current_turn->points; 
-    nikola::i32 points_lost = (app->current_turn->points / 4);
-
-    spawn_pop_up(app, "-" + std::to_string(points_lost), nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-    if(nikola::input_key_pressed(nikola::KEY_R)) {
-      turn_reset(*app->current_turn);
-
-      app->current_turn->points  = old_points;
-      app->current_turn->points -= points_lost;
-
-      app->points_left += points_lost;
-      return;
-    }
-  }
-
-  // Start turn
-
-  if(app->current_turn->rolls_count > 0 && nikola::input_key_pressed(nikola::KEY_R)) {
-    turn_start(*app->current_turn);
-
-    app->current_turn->rolls_count--;
-    if(app->current_turn->rolls_count < 0) {
-      app->current_turn->rolls_count = 0;
-    }
-  }
-
-  // Continue turn 
-
-  if(nikola::input_key_pressed(nikola::KEY_C)) {
-    turn_continue(*app->current_turn);
-    spawn_pop_up(app, "+" + std::to_string(app->current_turn->eval_points), nikola::Vec4(1.0f, 1.0f, 0.0f, 1.0f));
-  }
-
-  // Bank turn 
-
-  if(nikola::input_key_pressed(nikola::KEY_B)) {
-    nikola::i32 old_points = app->current_turn->points;
-
-    turn_bank(*app->current_turn);
-    nikola::i32 points_gained = app->current_turn->points - old_points;
-
-    spawn_pop_up(app, "+" + std::to_string(points_gained), nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
-    app->points_left -= points_gained;
-  }
-
   // Turn update
  
   turn_process_input(*app->current_turn);
@@ -254,29 +204,17 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
  
   // Ranking management 
 
-  if(app->points_left <= 0) { // We can level up!
+  if(app->current_turn->points > app->next_rank_points) { // We can level up!
     app->current_rank++;
-    
-    app->next_rank_points  = app->current_rank * 3000; 
-    app->points_left       = app->next_rank_points;
+    app->next_rank_points = app->current_rank * 3000;
 
     spawn_pop_up(app, "RANKED!", nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
   }
-
-  // This is when we have lost so much points that we need 
-  // to drop down a rank. 
-  if(app->points_left > app->next_rank_points) {
-    app->next_rank_points /= 2;
-    if(app->next_rank_points < 3000) { // Better clamp the ranking points to a certain range
-      app->next_rank_points = 3000;
-    }
-    
-    app->points_left = app->next_rank_points;
-    app->current_rank--; 
+   
+  if(app->next_rank_points < 3000) { // Better clamp the ranking points to a certain range
+    app->next_rank_points = 3000;
   }
-  
-  // Clamp the ranking points
-
+   
   if(app->current_rank <= 0) { // Clamp the rank
     app->current_rank = 1;
   } 
@@ -327,7 +265,7 @@ void app_render(nikola::App* app) {
                                "Banked points: " + std::to_string(app->current_turn->points));
     
     nikola::ui_text_set_string(app->game_hud.texts[8], 
-                               "Points left: " + std::to_string(app->points_left));
+                               "Next rank: " + std::to_string(app->next_rank_points));
     
     nikola::ui_text_set_string(app->game_hud.texts[9], 
                                "Rank: " + std::to_string(app->current_rank));

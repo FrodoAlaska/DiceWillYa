@@ -1,12 +1,18 @@
 # TODO 
 
-- STOP! PLAY SIMILIAR GOD DAMN GAMES, IDIOT! We cannot just beautify an incomplete prototype. 
+- Make a better ranking system that accounts for all the edge cases
+- Fix pop-ups and have a better system there 
 
-# Beautify For Playtesters
-
-- Get a better background 
-- Better game hud layout 
 - Shuffle between the music during gameplay
+- Better farkle animation
+- Better game HUD layout 
+    - [] Progress bar for the next rank 
+    - [] Keep the instructions in a seperate menu, not cluttered in the game's HUD 
+    - [] Little boxes for both the unbanked and banked points
+    - [] A little dice indicating the rolls left in this turn
+- Get a better background 
+
+- State manager
 - A menu screen for instructions... or maybe a tutorial mode? 
 - The main menu is a tavern sign with the game's name?
 

@@ -1,4 +1,5 @@
 #include "entities.h"
+#include "game_event.h"
 
 #include <nikola/nikola_pch.h>
 

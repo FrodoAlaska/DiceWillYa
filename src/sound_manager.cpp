@@ -1,5 +1,6 @@
 #include "sound_manager.h"
 #include "resource_database.h"
+#include "game_event.h"
 
 #include <nikola/nikola_pch.h>
 
@@ -15,6 +16,48 @@ struct SoundManager {
 
 static SoundManager s_manager;
 /// SoundManager
+/// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
+/// Callbacks
+
+static void sound_events_callbacks(const GameEvent& event, void* dispatcher, void* listener) {
+  SoundType sound_type = SOUNDS_MAX;
+
+  switch(event.type) {
+    case GAME_EVENT_FARKLED:
+      sound_type = SOUND_FARKLED;
+      break;
+    case GAME_EVENT_HAND_BANKED:
+      sound_type = SOUND_BANKING;
+      break;
+    case GAME_EVENT_HAND_CONTINUE:
+      sound_type = SOUND_COMBO_BANK;
+      break;
+    case GAME_EVENT_HAND_COMPLETE:
+      sound_type = SOUND_DICE_COMPLETE;
+      break;
+    case GAME_EVENT_HAND_INVALID:
+      sound_type = SOUND_DICE_INVALID;
+      break;
+    case GAME_EVENT_REROLL:
+      sound_type = SOUND_DICE_ROLL;
+      break;
+    case GAME_EVENT_RANKED:
+      // @TODO
+      break;
+    case GAME_EVENT_DICE_SELECTED:
+      sound_type = SOUND_DICE_CHOOSE;
+      break;
+  }
+
+  if(sound_type != SOUNDS_MAX) {
+    nikola::AudioSourceID source_id = s_manager.entries[(nikola::sizei)sound_type];
+    nikola::audio_source_start(source_id);
+  }
+}
+
+/// Callbacks
 /// ----------------------------------------------------------------------
 
 /// ----------------------------------------------------------------------
@@ -54,6 +97,17 @@ void sound_manager_init() {
     .volume = s_manager.master_volume,
   };
   nikola::audio_listener_init(listen_desc); 
+
+  // Listen to events
+  
+  game_event_listen(GAME_EVENT_FARKLED, sound_events_callbacks);
+  game_event_listen(GAME_EVENT_HAND_BANKED, sound_events_callbacks);
+  game_event_listen(GAME_EVENT_HAND_CONTINUE, sound_events_callbacks);
+  game_event_listen(GAME_EVENT_HAND_COMPLETE, sound_events_callbacks);
+  game_event_listen(GAME_EVENT_HAND_INVALID, sound_events_callbacks);
+  game_event_listen(GAME_EVENT_REROLL, sound_events_callbacks);
+  game_event_listen(GAME_EVENT_RANKED, sound_events_callbacks);
+  game_event_listen(GAME_EVENT_DICE_SELECTED, sound_events_callbacks);
 }
 
 void sound_manager_shutdown() {
@@ -65,9 +119,7 @@ void sound_manager_shutdown() {
 
 void sound_manager_play(const SoundType type, const nikola::f32 pitch) {
   nikola::AudioSourceID source_id = s_manager.entries[(nikola::sizei)type];
-
-  nikola::audio_source_set_pitch(source_id, pitch);
-  // nikola::audio_source_start(source_id);
+  nikola::audio_source_start(source_id);
 }
 
 void sound_manager_stop(const SoundType type) {

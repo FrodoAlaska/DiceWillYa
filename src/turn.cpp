@@ -1,5 +1,6 @@
 #include "entities.h"
 #include "sound_manager.h"
+#include "game_event.h"
 
 #include <nikola/nikola_pch.h>
 
@@ -72,7 +73,7 @@ void turn_process_input(Turn& turn) {
     turn.dice_cursor = 0;
   }
 
-  // Set the cursor's position to the currently selected dice (if it's active.
+  // Set the cursor's position to the currently selected dice (if it's active).
 
   Dice* dice = &turn.dices[turn.dice_cursor];
   
@@ -82,11 +83,36 @@ void turn_process_input(Turn& turn) {
   // Select the dice
   
   if(nikola::input_key_pressed(nikola::KEY_SPACE)) {
-    nikola::f32 random_pitch = nikola::random_f32(0.8f, 1.0f);
-    sound_manager_play(SOUND_DICE_CHOOSE, random_pitch);
-
     dice_toggle_select(*dice, !dice->is_selected);
+    
+    GameEvent event = {
+      .type = GAME_EVENT_DICE_SELECTED,
+    };
+    game_event_dispatch(event);
   } 
+
+  // Start turn
+
+  if(turn.rolls_count > 0 && nikola::input_key_pressed(nikola::KEY_R)) {
+    turn_start(turn);
+    turn.rolls_count--;
+  }
+
+  // Continue turn
+
+  if(nikola::input_key_pressed(nikola::KEY_C)) {
+    turn_continue(turn);
+  }
+  
+  if(turn.rolls_count < 0) { // Clamp the rolls count
+    turn.rolls_count = 0;
+  }
+  
+  // Bank turn 
+
+  if(nikola::input_key_pressed(nikola::KEY_B)) {
+    turn_bank(turn);
+  }
 }
 
 void turn_update(Turn& turn, const nikola::f32 dt) {
@@ -107,22 +133,52 @@ void turn_update(Turn& turn, const nikola::f32 dt) {
       dice_reset(turn.dices[i]);
       dice_roll(turn.dices[i]); 
     }
-    sound_manager_play(SOUND_DICE_COMPLETE);
+ 
+    GameEvent event = {
+      .type = GAME_EVENT_HAND_COMPLETE,
+    };
+    game_event_dispatch(event);
   }
 }
 
 void turn_start(Turn& turn) {
+  // Roll the dice 
+  
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
     dice_roll(turn.dices[i]);
   }
-  sound_manager_play(SOUND_DICE_ROLL);
+
+  // Check for a farkle
 
   nikola::i32 eval_res = rulebook_evaluate_active(turn.dices);
   turn.is_farkle       = (eval_res <= 0);
 
-  if(turn.is_farkle) {
-    sound_manager_play(SOUND_FARKLED);
+  if(!turn.is_farkle) {
+    return;
   }
+
+  // Farkled! Deduce the points
+
+  nikola::i32 old_points  = turn.points;
+  nikola::i32 points_lost = turn.points / 4; 
+
+  turn_reset(turn);
+
+  turn.points  = old_points;
+  turn.points -= points_lost;
+ 
+  // Send an event to inform the rest of the game
+
+  GameEvent event = {
+    .type        = GAME_EVENT_FARKLED,
+    .points_lost = (nikola::u32)points_lost,
+  };
+  game_event_dispatch(event);
+
+
+  // Re-roll 
+  // @TEMP: Potentially harmful!
+  turn_start(turn);
 }
 
 void turn_continue(Turn& turn) {
@@ -135,7 +191,11 @@ void turn_continue(Turn& turn) {
       dice_toggle_select(turn.dices[i], false);
     }
 
-    sound_manager_play(SOUND_DICE_INVALID);
+    GameEvent event = {
+      .type = GAME_EVENT_HAND_INVALID,
+    };
+    game_event_dispatch(event);
+    
     return;
   } 
 
@@ -156,8 +216,13 @@ void turn_continue(Turn& turn) {
     dice_toggle_select(turn.dices[i], false);
   }
 
+  GameEvent event = {
+    .type          = GAME_EVENT_HAND_CONTINUE,
+    .points_gained = (nikola::u32)turn.eval_points, 
+  };
+  game_event_dispatch(event);
+
   turn.continues++;
-  sound_manager_play(SOUND_COMBO_BANK); 
 
   // Guess if the next turn is going to be a farkle or not
   if(turn.dices_count > 0) {
@@ -175,13 +240,20 @@ void turn_bank(Turn& turn) {
       dice_toggle_select(turn.dices[i], false);
     }
 
+    GameEvent event = {
+      .type = GAME_EVENT_HAND_INVALID,
+    };
+    game_event_dispatch(event);
+
     sound_manager_play(SOUND_DICE_INVALID);
     return;
   } 
 
   // Bank the points otherwise
 
-  turn.points          += (turn.unbanked_points + turn.eval_points) * turn.continues;
+  nikola::u32 points_gained = (turn.unbanked_points + turn.eval_points) * turn.continues;
+
+  turn.points          += points_gained;
   turn.unbanked_points = 0;  
   turn.eval_points     = 0; 
   turn.continues       = 1;
@@ -189,12 +261,21 @@ void turn_bank(Turn& turn) {
   turn.dices_count = DICES_MAX;
   turn.rolls_count = ROLLS_MAX;
 
-  sound_manager_play(SOUND_BANKING);
+  // Send an event
+  
+  GameEvent event = {
+    .type          = GAME_EVENT_HAND_BANKED,
+    .points_gained = points_gained,
+  };
+  game_event_dispatch(event);
 
+  // Reset the dice
+  
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
     dice_reset(turn.dices[i]);
   } 
 
+  // Re-roll
   turn_start(turn);
 }
 
