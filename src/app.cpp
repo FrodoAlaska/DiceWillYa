@@ -2,6 +2,8 @@
 #include "entities.h"
 #include "resource_database.h"
 #include "sound_manager.h"
+#include "pop_up_manager.h"
+#include "game_event.h"
 
 #include <nikola/nikola_pch.h>
 #include <imgui/imgui.h>
@@ -94,13 +96,6 @@ static void init_hud(nikola::App* app) {
   nikola::ui_layout_end(app->pop_ups);
 }
 
-static void spawn_pop_up(nikola::App* app, const nikola::String& txt, const nikola::Vec4& color) {
-  app->pop_ups.is_active      = true;
-  app->pop_ups.texts[0].color = color;
-
-  nikola::ui_text_set_string(app->pop_ups.texts[0], txt);
-}
-
 /// Private functions
 /// ----------------------------------------------------------------------
 
@@ -152,6 +147,9 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   // Rules init
   rulebook_init();
 
+  // Pop-ups init
+  popup_manager_init(window);
+
   // Turns init
   
   turn_create(&app->player_turn);
@@ -201,14 +199,21 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
  
   turn_process_input(*app->current_turn);
   turn_update(*app->current_turn, (nikola::f32)delta_time);
- 
+
+  // Pop-ups update
+  popup_manager_update();
+
   // Ranking management 
 
   if(app->current_turn->points > app->next_rank_points) { // We can level up!
     app->current_rank++;
     app->next_rank_points = app->current_rank * 3000;
 
-    spawn_pop_up(app, "RANKED!", nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    GameEvent event = {
+      .type     = GAME_EVENT_RANKED, 
+      .new_rank = app->current_rank,
+    };
+    game_event_dispatch(event);
   }
    
   if(app->next_rank_points < 3000) { // Better clamp the ranking points to a certain range
@@ -218,12 +223,6 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
   if(app->current_rank <= 0) { // Clamp the rank
     app->current_rank = 1;
   } 
-
-  // Pop-ups management
-
-  if((app->pop_ups.texts[0].color.a <= 0.1)) {
-    app->pop_ups.is_active = false;
-  }
 }
  
 void app_render(nikola::App* app) {
@@ -281,9 +280,8 @@ void app_render(nikola::App* app) {
     nikola::ui_text_render(app->game_hud.texts[10]);
   }
 
-  nikola::ui_text_apply_animation(app->pop_ups.texts[0], nikola::UI_TEXT_ANIMATION_FADE_OUT, 0.8f);
-  nikola::ui_text_apply_animation(app->pop_ups.texts[0], nikola::UI_TEXT_ANIMATION_SLIDE_UP, 30.5f);
-  nikola::ui_layout_render(app->pop_ups);
+  // Pop-ups render
+  popup_manager_render();
   
   nikola::batch_renderer_end();
 }

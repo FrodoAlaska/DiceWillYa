@@ -1,8 +1,5 @@
 # TODO 
 
-- Make a better ranking system that accounts for all the edge cases
-- Fix pop-ups and have a better system there 
-
 - Shuffle between the music during gameplay
 - Better farkle animation
 - Better game HUD layout 
@@ -11,6 +8,7 @@
     - [] Little boxes for both the unbanked and banked points
     - [] A little dice indicating the rolls left in this turn
 - Get a better background 
+- A sound effect for the ranked action
 
 - State manager
 - A menu screen for instructions... or maybe a tutorial mode? 

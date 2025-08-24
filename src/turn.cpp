@@ -147,6 +147,11 @@ void turn_start(Turn& turn) {
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
     dice_roll(turn.dices[i]);
   }
+  
+  GameEvent roll_event = {
+    .type = GAME_EVENT_REROLL,
+  };
+  game_event_dispatch(roll_event);
 
   // Check for a farkle
 
@@ -160,21 +165,27 @@ void turn_start(Turn& turn) {
   // Farkled! Deduce the points
 
   nikola::i32 old_points  = turn.points;
-  nikola::i32 points_lost = turn.points / 4; 
+  nikola::i32 points_lost = (turn.points / 4); 
+ 
+  // Send an event to inform the rest of the game
+
+  // @NOTE: Sometimes the `points_lost` is 0 because there 
+  // are no points that have been banked yet. That is not 
+  // very informative. So, we use the unbanked points 
+  // instead to show how much was lost
+
+  GameEvent event = {
+    .type        = GAME_EVENT_FARKLED,
+    .points_lost = (nikola::u32)(points_lost + turn.unbanked_points),
+  };
+  game_event_dispatch(event);
+
+  // Setup the turn state
 
   turn_reset(turn);
 
   turn.points  = old_points;
   turn.points -= points_lost;
- 
-  // Send an event to inform the rest of the game
-
-  GameEvent event = {
-    .type        = GAME_EVENT_FARKLED,
-    .points_lost = (nikola::u32)points_lost,
-  };
-  game_event_dispatch(event);
-
 
   // Re-roll 
   // @TEMP: Potentially harmful!
