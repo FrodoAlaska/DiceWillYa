@@ -1,14 +1,15 @@
 # TODO 
 
-- Shuffle between the music during gameplay
-- Better farkle animation
 - Better game HUD layout 
     - [] Progress bar for the next rank 
     - [] Keep the instructions in a seperate menu, not cluttered in the game's HUD 
     - [] Little boxes for both the unbanked and banked points
     - [] A little dice indicating the rolls left in this turn
-- Get a better background 
 - A sound effect for the ranked action
+
+- Better farkle animation
+- Get a better background 
+- Shuffle between the music during gameplay
 
 - State manager
 - A menu screen for instructions... or maybe a tutorial mode? 

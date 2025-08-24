@@ -4,6 +4,8 @@
 #include "sound_manager.h"
 #include "pop_up_manager.h"
 #include "game_event.h"
+#include "huds/hud_manager.h"
+#include "ranking_manager.h"
 
 #include <nikola/nikola_pch.h>
 #include <imgui/imgui.h>
@@ -25,78 +27,15 @@ struct nikola::App {
   Turn player_turn; 
   Turn* current_turn = nullptr;
 
-  nikola::i32 next_rank_points = 3000;
-  nikola::u32 current_rank     = 1;
-
   // Transforms
 
   nikola::Transform plane;
-
-  // UI
- 
-  nikola::UILayout game_hud;
-  nikola::UILayout pop_ups;
 
   // GUI
 
   bool has_editor = false;
 };
 /// App
-/// ----------------------------------------------------------------------
-
-/// ----------------------------------------------------------------------
-/// Private functions
-
-static void init_hud(nikola::App* app) {
-  nikola::ui_layout_create(&app->game_hud, app->window, resource_database_get(RESOURCE_FONT));
-
-  // Instructions 
-
-  nikola::ui_layout_begin(app->game_hud, nikola::UI_ANCHOR_BOTTOM_LEFT, nikola::Vec2(0.0f, -24.0f));
-
-  nikola::Vec4 insts_color = nikola::Vec4(1.0f);
-
-  nikola::ui_layout_push_text(app->game_hud, "C      - Continue turn", 24.0f, insts_color);
-  nikola::ui_layout_push_text(app->game_hud, "B      - Bank the points", 24.0f, insts_color);
-  nikola::ui_layout_push_text(app->game_hud, "R      - Re-roll (Rolls: 0)", 24.0f, insts_color);
-  nikola::ui_layout_push_text(app->game_hud, "ARROWS - Move", 24.0f, insts_color);
-  nikola::ui_layout_push_text(app->game_hud, "SPACE  - Select dice", 24.0f, insts_color);
-
-  nikola::ui_layout_end(app->game_hud);
-
-  // Scores
-  
-  nikola::ui_layout_begin(app->game_hud, nikola::UI_ANCHOR_TOP_LEFT, nikola::Vec2(0.0f, 24.0f));
-
-  nikola::ui_layout_push_text(app->game_hud, "Turn points:     0", 24.0f, nikola::Vec4(1.0f));
-  nikola::ui_layout_push_text(app->game_hud, "Unbanked points: 0", 24.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-  nikola::ui_layout_push_text(app->game_hud, "Banked points:   0", 24.0f, nikola::Vec4(0.0f, 1.0f, 0.0f, 1.0f));
-  
-  nikola::ui_layout_push_text(app->game_hud, "Points left: 0", 24.0f, nikola::Vec4(1.0f));
-  nikola::ui_layout_push_text(app->game_hud, "Rank:        0", 24.0f, nikola::Vec4(1.0f));
-
-  nikola::ui_layout_end(app->game_hud);
-
-  // Farkle
-  
-  nikola::ui_layout_begin(app->game_hud, nikola::UI_ANCHOR_CENTER);
-  
-  nikola::ui_layout_push_text(app->game_hud, "FARKLED!", 48.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
-  app->game_hud.texts[10].is_active = false; 
-
-  nikola::ui_layout_end(app->game_hud);
-
-  // Pop-ups
-
-  nikola::ui_layout_create(&app->pop_ups, app->window, resource_database_get(RESOURCE_FONT));
-  app->pop_ups.is_active = false;
-
-  nikola::ui_layout_begin(app->pop_ups, nikola::UI_ANCHOR_CENTER);
-  nikola::ui_layout_push_text(app->pop_ups, "+100", 42.0f, nikola::Vec4(1.0f, 0.0f, 0.0f, 1.0f), nikola::Vec2(0.0f, -128.0f));
-  nikola::ui_layout_end(app->pop_ups);
-}
-
-/// Private functions
 /// ----------------------------------------------------------------------
 
 /// ----------------------------------------------------------------------
@@ -155,8 +94,8 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   turn_create(&app->player_turn);
   app->current_turn = &app->player_turn;
 
-  // HUD init
-  init_hud(app);
+  // HUDs init
+  hud_manager_init(app, window);
 
   // Transforms init
 
@@ -202,27 +141,12 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
 
   // Pop-ups update
   popup_manager_update();
+  
+  // Ranking update
+  ranking_manager_update(app->current_turn);
 
-  // Ranking management 
-
-  if(app->current_turn->points > app->next_rank_points) { // We can level up!
-    app->current_rank++;
-    app->next_rank_points = app->current_rank * 3000;
-
-    GameEvent event = {
-      .type     = GAME_EVENT_RANKED, 
-      .new_rank = app->current_rank,
-    };
-    game_event_dispatch(event);
-  }
-   
-  if(app->next_rank_points < 3000) { // Better clamp the ranking points to a certain range
-    app->next_rank_points = 3000;
-  }
-   
-  if(app->current_rank <= 0) { // Clamp the rank
-    app->current_rank = 1;
-  } 
+  // HUDs update
+  hud_manager_update();
 }
  
 void app_render(nikola::App* app) {
@@ -245,40 +169,10 @@ void app_render(nikola::App* app) {
 
   nikola::renderer_end();
 
-  // UI
-
   nikola::batch_renderer_begin();
-  nikola::Font* font = nikola::resources_get_font(resource_database_get(RESOURCE_FONT));
-   
-  if(!app->current_turn->is_farkle) {
-    nikola::ui_text_set_string(app->game_hud.texts[2], 
-                               "R      - Re-roll (Rolls: " + std::to_string(app->current_turn->rolls_count) + ")");
-
-    nikola::ui_text_set_string(app->game_hud.texts[5], 
-                               "Turn points: " + std::to_string(app->current_turn->eval_points));
-    
-    nikola::ui_text_set_string(app->game_hud.texts[6], 
-                               "Unbanked points: " + std::to_string(app->current_turn->unbanked_points));
-    
-    nikola::ui_text_set_string(app->game_hud.texts[7], 
-                               "Banked points: " + std::to_string(app->current_turn->points));
-    
-    nikola::ui_text_set_string(app->game_hud.texts[8], 
-                               "Next rank: " + std::to_string(app->next_rank_points));
-    
-    nikola::ui_text_set_string(app->game_hud.texts[9], 
-                               "Rank: " + std::to_string(app->current_rank));
-    
-    app->game_hud.texts[10].is_active = false; // Farkle text 
-    
-    nikola::ui_layout_render(app->game_hud);
-  }
-  else {
-    app->game_hud.texts[10].is_active = true; 
-    
-    nikola::ui_text_apply_animation(app->game_hud.texts[10], nikola::UI_TEXT_ANIMATION_FADE_IN, 1.5f);
-    nikola::ui_text_render(app->game_hud.texts[10]);
-  }
+  
+  // HUDs render
+  hud_manager_render(); 
 
   // Pop-ups render
   popup_manager_render();
@@ -342,6 +236,10 @@ void app_render_gui(nikola::App* app) {
 
   nikola::gui_end_panel();
   nikola::gui_end();
+}
+
+const Turn* app_get_current_turn(nikola::App* app) {
+  return app->current_turn;
 }
 
 /// App functions 

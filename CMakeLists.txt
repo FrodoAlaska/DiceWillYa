@@ -63,6 +63,11 @@ set(PROJECT_SOURCES
   ${PROJECT_SRC_DIR}/game_event.cpp
   ${PROJECT_SRC_DIR}/sound_manager.cpp
   ${PROJECT_SRC_DIR}/pop_up_manager.cpp
+  ${PROJECT_SRC_DIR}/ranking_manager.cpp
+
+  # HUDs 
+  ${PROJECT_SRC_DIR}/huds/hud_manager.cpp
+  ${PROJECT_SRC_DIR}/huds/game_hud.cpp
 )
 ############################################################
 

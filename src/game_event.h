@@ -14,6 +14,8 @@ enum GameEventType {
   GAME_EVENT_RANKED,
   GAME_EVENT_DICE_SELECTED,
 
+  GAME_EVENT_HUD_CHANGED,
+
   GAME_EVENTS_MAX,
 };
 /// GameEventType
@@ -27,6 +29,8 @@ struct GameEvent {
   nikola::u32 points_gained = 0; 
   nikola::u32 points_lost   = 0;
   nikola::u32 new_rank      = 0;
+
+  nikola::u32 hud_type;
 };
 /// GameEvent
 /// ----------------------------------------------------------------------
