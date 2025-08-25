@@ -7,7 +7,7 @@
 /// ----------------------------------------------------------------------
 /// Ranking manager functions
 
-void ranking_manager_update(const Turn* turn);
+void ranking_manager_init(); 
 
 const nikola::u32 ranking_manager_get_current_rank();
 

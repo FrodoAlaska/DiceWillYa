@@ -40,6 +40,7 @@ struct Turn {
   nikola::i32 eval_points     = 0;
   
   nikola::u32 continues = 1;
+  nikola::u32 clearings = 1;
 
   nikola::i32 dices_count = DICES_MAX;
   nikola::i32 rolls_count = ROLLS_MAX;

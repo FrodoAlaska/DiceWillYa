@@ -18,7 +18,7 @@ const nikola::Vec4 get_rotation_from_value(const nikola::i32 value) {
     case 5:
       return nikola::Vec4(0.0f, 0.0f, 1.0f, -90.0f * nikola::DEG2RAD);
     case 6:
-      return nikola::Vec4(1.0f, 1.0f, 1.0f, 0.0f);
+      return nikola::Vec4(0.0f, 1.0f, 0.0f, 90.0f * nikola::DEG2RAD);
     default:
       return nikola::Vec4(-1.0f);
   }

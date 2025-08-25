@@ -50,6 +50,10 @@ static void pop_texts_callbacks(const GameEvent& event, void* dispatcher, void* 
       break;
     case GAME_EVENT_HAND_CONTINUE:
       popup_manager_spawn("+" + std::to_string(event.points_gained), nikola::Vec3(1.0f, 1.0f, 0.0f));
+      popup_manager_spawn("X" + std::to_string(event.multiplier), nikola::Vec3(0.0f, 1.0f, 1.0f), nikola::Vec2(0.0f, -180.0f));
+      break;
+    case GAME_EVENT_HAND_COMPLETE:
+      popup_manager_spawn("X" + std::to_string(event.multiplier), nikola::Vec3(0.0f, 1.0f, 1.0f), nikola::Vec2(0.0f, -180.0f));
       break;
     case GAME_EVENT_RANKED:
       popup_manager_spawn("RANKED!", nikola::Vec3(0.0f, 1.0f, 0.0f), nikola::Vec2(0.0f, -200.0f));

@@ -12,9 +12,9 @@ void turn_create(Turn* out_turn) {
 
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
     nikola::Vec3 pos;
-    pos.x = 5.0f + (i * 2.0f);
-    pos.z = -2.5f;
-    pos.y = -3.0f; 
+    pos.x = 9.9f;
+    pos.y = 7.0f; 
+    pos.z = 1.07f - (0.4f * i);
 
     dice_create(&out_turn->dices[i], pos);
   }
@@ -22,7 +22,7 @@ void turn_create(Turn* out_turn) {
   // Cursor init
 
   nikola::transform_translate(out_turn->cursor, out_turn->dices[0].transform.position);
-  nikola::transform_scale(out_turn->cursor, nikola::Vec3(1.0f));
+  nikola::transform_scale(out_turn->cursor, nikola::Vec3(0.18f));
 
   // Roll the dice and start an early turn
   // We also need to make sure we don't farkle (lose) right away
@@ -44,7 +44,9 @@ void turn_reset(Turn& turn) {
   turn.points          = 0;
   turn.unbanked_points = 0;  
   turn.eval_points     = 0; 
-  turn.continues       = 1;
+
+  turn.continues = 1;
+  turn.clearings = 1;
 
   turn.is_farkle   = false; 
   turn.dices_count = DICES_MAX;
@@ -78,7 +80,7 @@ void turn_process_input(Turn& turn) {
   Dice* dice = &turn.dices[turn.dice_cursor];
   
   nikola::Vec3 dice_pos = turn.cursor.position;
-  nikola::transform_translate(turn.cursor, nikola::Vec3(dice->transform.position.x, dice_pos.y, dice_pos.z));
+  nikola::transform_translate(turn.cursor, nikola::Vec3(dice_pos.x, dice_pos.y, dice->transform.position.z));
    
   // Select the dice
   
@@ -133,9 +135,12 @@ void turn_update(Turn& turn, const nikola::f32 dt) {
       dice_reset(turn.dices[i]);
       dice_roll(turn.dices[i]); 
     }
+
+    turn.clearings++;
  
     GameEvent event = {
-      .type = GAME_EVENT_HAND_COMPLETE,
+      .type       = GAME_EVENT_HAND_COMPLETE,
+      .multiplier = turn.clearings,
     };
     game_event_dispatch(event);
   }
@@ -214,7 +219,6 @@ void turn_continue(Turn& turn) {
   // Add the evaluation result to the accumulated points, 
   // and discard the dice that were selected.
 
-  turn.unbanked_points += turn.eval_points;  
   for(nikola::sizei i = 0; i < DICES_MAX; i++) {
     // The dice was successfully discarded and therefore 
     // it will be ignored.
@@ -227,13 +231,15 @@ void turn_continue(Turn& turn) {
     dice_toggle_select(turn.dices[i], false);
   }
 
+  turn.continues++;
+  turn.unbanked_points += turn.eval_points;  
+
   GameEvent event = {
     .type          = GAME_EVENT_HAND_CONTINUE,
     .points_gained = (nikola::u32)turn.eval_points, 
+    .multiplier    = turn.continues,
   };
   game_event_dispatch(event);
-
-  turn.continues++;
 
   // Guess if the next turn is going to be a farkle or not
   if(turn.dices_count > 0) {
@@ -262,12 +268,14 @@ void turn_bank(Turn& turn) {
 
   // Bank the points otherwise
 
-  nikola::u32 points_gained = (turn.unbanked_points + turn.eval_points) * turn.continues;
+  nikola::u32 points_gained = (turn.unbanked_points + turn.eval_points) * turn.continues * turn.clearings;
 
-  turn.points          += points_gained;
+  turn.points         += points_gained;
   turn.unbanked_points = 0;  
   turn.eval_points     = 0; 
-  turn.continues       = 1;
+
+  turn.continues = 1;
+  turn.clearings = 1;
 
   turn.dices_count = DICES_MAX;
   turn.rolls_count = ROLLS_MAX;

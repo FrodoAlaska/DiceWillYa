@@ -30,6 +30,8 @@ struct GameEvent {
   nikola::u32 points_lost   = 0;
   nikola::u32 new_rank      = 0;
 
+  nikola::u32 multiplier = 1;
+
   nikola::u32 hud_type;
 };
 /// GameEvent

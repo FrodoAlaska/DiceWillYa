@@ -17,12 +17,15 @@ static ResourceDatabase s_database;
 /// Resource database functions 
 
 void resource_database_init(const nikola::ResourceGroupID& group_id) {
+  // Push all the resources in...
+  nikola::resources_push_dir(group_id, "res");
+
   // Meshes init
   s_database.resources[RESOURCE_CUBE] = nikola::resources_push_mesh(group_id, nikola::GEOMETRY_CUBE);
  
   // Skybox init
 
-  nikola::ResourceID cubemap_id         = nikola::resources_get_id(group_id, "corona");
+  nikola::ResourceID cubemap_id         = nikola::resources_get_id(group_id, "accurate_night");
   s_database.resources[RESOURCE_SKYBOX] = nikola::resources_push_skybox(group_id, cubemap_id);
 
   // Materials init

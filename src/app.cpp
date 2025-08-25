@@ -51,22 +51,20 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   // Camera init
   
   nikola::CameraDesc cam_desc = {
-    .position     = nikola::Vec3(10.0f, 16.0f, 1.0f),
-    .target       = nikola::Vec3(-3.0f, 16.0f, 0.0f),
+    .position     = nikola::Vec3(10.1f, 10.5f, 0.18f),
+    .target       = nikola::Vec3(-3.0f, 10.0f, 0.0f),
     .up_axis      = nikola::Vec3(0.0f, 1.0f, 0.0f),
     .aspect_ratio = nikola::window_get_aspect_ratio(app->window),
     .move_func    = nullptr,
   };
   nikola::camera_create(&app->frame.camera, cam_desc);
 
-  app->frame.camera.yaw   = -89.4f; 
-  app->frame.camera.pitch = -84.0f; 
+  app->frame.camera.yaw   = 178.0f; 
+  app->frame.camera.pitch = -89.0f; 
 
   // Resources init
   
   app->resource_group = nikola::resources_create_group("app_res", "./");
-  nikola::resources_push_dir(app->resource_group, "res");
-
   resource_database_init(app->resource_group);
 
   // GUI init
@@ -88,6 +86,9 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
 
   // Pop-ups init
   popup_manager_init(window);
+  
+  // Ranking manager init
+  ranking_manager_init();  
 
   // Turns init
   
@@ -95,12 +96,13 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   app->current_turn = &app->player_turn;
 
   // HUDs init
-  hud_manager_init(app, window);
+  hud_manager_init(app->current_turn, window);
 
   // Transforms init
 
-  nikola::transform_translate(app->plane, nikola::Vec3(10.0f, -5.0f, 0.0f));
-  nikola::transform_scale(app->plane, nikola::Vec3(16.0f, 1.0f, 16.0f));
+  nikola::transform_translate(app->plane, nikola::Vec3(10.0f, 5.0f, 0.15f));
+  nikola::transform_rotate(app->plane, nikola::Vec3(1.0f, 0.0f, 0.0f), 4.7f);
+  nikola::transform_scale(app->plane, nikola::Vec3(15.0f));
 
   return app;
 }
@@ -141,9 +143,6 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
 
   // Pop-ups update
   popup_manager_update();
-  
-  // Ranking update
-  ranking_manager_update(app->current_turn);
 
   // HUDs update
   hud_manager_update();
@@ -155,7 +154,7 @@ void app_render(nikola::App* app) {
   nikola::ResourceID cube_id = resource_database_get(RESOURCE_CUBE);
 
   // Plane
-  nikola::renderer_queue_mesh(cube_id, app->plane, resource_database_get(RESOURCE_MATERIAL_PLANE));
+  nikola::renderer_queue_model(resource_database_get(RESOURCE_TABLE), app->plane);
  
   // Dices 
 
@@ -194,6 +193,7 @@ void app_render_gui(nikola::App* app) {
 
   if(ImGui::CollapsingHeader("Entities")) {
     nikola::gui_edit_transform("Plane", &app->plane);
+    nikola::gui_edit_transform("Dice", &app->current_turn->dices[0].transform);
   }
 
   // Lights
@@ -236,10 +236,6 @@ void app_render_gui(nikola::App* app) {
 
   nikola::gui_end_panel();
   nikola::gui_end();
-}
-
-const Turn* app_get_current_turn(nikola::App* app) {
-  return app->current_turn;
 }
 
 /// App functions 

@@ -1,17 +1,8 @@
 # TODO 
 
-- Better game HUD layout 
-    - [] Progress bar for the next rank 
-    - [] Keep the instructions in a seperate menu, not cluttered in the game's HUD 
-    - [] Little boxes for both the unbanked and banked points
-    - [] A little dice indicating the rolls left in this turn
-- A sound effect for the ranked action
-
-- Better farkle animation
-- Get a better background 
+- A sound effect for the ranked action and for UI click
 - Shuffle between the music during gameplay
 
-- State manager
 - A menu screen for instructions... or maybe a tutorial mode? 
 - The main menu is a tavern sign with the game's name?
 

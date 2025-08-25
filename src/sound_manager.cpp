@@ -51,10 +51,7 @@ static void sound_events_callbacks(const GameEvent& event, void* dispatcher, voi
       break;
   }
 
-  if(sound_type != SOUNDS_MAX) {
-    nikola::AudioSourceID source_id = s_manager.entries[(nikola::sizei)sound_type];
-    nikola::audio_source_start(source_id);
-  }
+  sound_manager_play(sound_type);
 }
 
 /// Callbacks
@@ -118,8 +115,8 @@ void sound_manager_shutdown() {
 }
 
 void sound_manager_play(const SoundType type, const nikola::f32 pitch) {
-  nikola::AudioSourceID source_id = s_manager.entries[(nikola::sizei)type];
-  nikola::audio_source_start(source_id);
+  // nikola::AudioSourceID source_id = s_manager.entries[(nikola::sizei)type];
+  // nikola::audio_source_start(source_id);
 }
 
 void sound_manager_stop(const SoundType type) {

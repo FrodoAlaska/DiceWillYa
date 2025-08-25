@@ -26,10 +26,10 @@ static void hud_event_callback(const GameEvent& event, void* dispatcher, void* l
 /// ----------------------------------------------------------------------
 /// HUD manager functions
 
-void hud_manager_init(nikola::App* app, nikola::Window* window) {
+void hud_manager_init(Turn* turn, nikola::Window* window) {
   // HUDs init 
   
-  game_hud_init(app, window);
+  game_hud_init(turn, window);
 
   // Listen to events
   game_event_listen(GAME_EVENT_HUD_CHANGED, hud_event_callback); 

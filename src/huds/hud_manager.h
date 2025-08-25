@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "app.h"
+#include "entities.h"
 
 #include <nikola/nikola_pch.h> 
 
@@ -19,7 +19,7 @@ enum HUDType {
 /// ----------------------------------------------------------------------
 /// HUD manager functions
 
-void hud_manager_init(nikola::App* app, nikola::Window* window);
+void hud_manager_init(Turn* turn, nikola::Window* window);
 
 void hud_manager_update();
 
@@ -31,7 +31,7 @@ void hud_manager_render();
 /// ----------------------------------------------------------------------
 /// Game hud functions
 
-void game_hud_init(nikola::App* app, nikola::Window* window);
+void game_hud_init(Turn* turn, nikola::Window* window);
 
 void game_hud_update(); 
 
