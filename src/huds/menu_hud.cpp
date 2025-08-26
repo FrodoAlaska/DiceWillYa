@@ -7,7 +7,7 @@
 /// ----------------------------------------------------------------------
 /// MenuButtonID 
 enum MenuButtonID {
-  BUTTON_PLAY = 0, 
+  BUTTON_PLAY = 0xFF, 
   BUTTON_SETTINGS, 
   BUTTON_CONTROLS, 
   BUTTON_QUIT,
@@ -29,22 +29,20 @@ static MenuHUD s_hud;
 /// Callbacks
 
 static bool menu_buttons_callback(const nikola::Event& event, const void* dispatcher, const void* listener) {
-  if(event.type != nikola::EVENT_UI_BUTTON_CLICKED) {
-    return false;
-  }
-
   switch(event.button->id) {
     case BUTTON_PLAY:
       game_event_dispatch({
-        .type     = GAME_EVENT_HUD_CHANGED, 
-        .hud_type = (nikola::u32)HUD_GAME,
+        .type           = GAME_EVENT_HUD_CHANGED, 
+        .hud_type       = (nikola::u32)HUD_GAME,
+        .is_fresh_start = true,
       });      
       break;
     case BUTTON_SETTINGS:
       game_event_dispatch({
         .type     = GAME_EVENT_HUD_CHANGED, 
         .hud_type = (nikola::u32)HUD_SETTINGS,
-      });      
+      });  
+      break;
     case BUTTON_CONTROLS:
       game_event_dispatch({
         .type     = GAME_EVENT_HUD_CHANGED, 
@@ -87,6 +85,7 @@ void menu_hud_init(nikola::Window* window) {
                                 nikola::Vec4(1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
+                                BUTTON_PLAY,
                                 nikola::Vec2(0.0f, -64.0f));
   
   nikola::ui_layout_push_button(s_hud.layout, 
@@ -95,6 +94,7 @@ void menu_hud_init(nikola::Window* window) {
                                 nikola::Vec4(1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
+                                BUTTON_SETTINGS,
                                 nikola::Vec2(0.0f, -64.0f));
   
   nikola::ui_layout_push_button(s_hud.layout, 
@@ -103,6 +103,7 @@ void menu_hud_init(nikola::Window* window) {
                                 nikola::Vec4(1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
+                                BUTTON_CONTROLS,
                                 nikola::Vec2(0.0f, -64.0f));
   
   nikola::ui_layout_push_button(s_hud.layout, 
@@ -111,6 +112,7 @@ void menu_hud_init(nikola::Window* window) {
                                 nikola::Vec4(1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
+                                BUTTON_QUIT,
                                 nikola::Vec2(0.0f, -64.0f));
 
   nikola::ui_layout_end(s_hud.layout);

@@ -25,6 +25,8 @@ void hud_manager_update();
 
 void hud_manager_render();
 
+const HUDType hud_manager_get_current_hud();
+
 /// HUD manager functions
 /// ----------------------------------------------------------------------
 
@@ -48,4 +50,24 @@ void menu_hud_init(nikola::Window* window);
 void menu_hud_render();
 
 /// Menu hud functions
+/// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
+/// Settings hud functions
+
+void settings_hud_init(nikola::Window* window);
+
+void settings_hud_render();
+
+/// Settings hud functions
+/// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
+/// Pause hud functions
+
+void pause_hud_init(nikola::Window* window);
+
+void pause_hud_render();
+
+/// Pause hud functions
 /// ----------------------------------------------------------------------

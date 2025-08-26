@@ -14,7 +14,7 @@ enum SoundType {
   SOUND_COMBO_BANK,
   SOUND_FARKLED, 
   
-  // SOUND_UI_CLICK, 
+  SOUND_UI_CLICK, 
   
   SOUND_MUSIC1,
   SOUND_MUSIC2,

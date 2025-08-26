@@ -26,8 +26,10 @@ struct nikola::App {
   
   Turn player_turn; 
   Turn* current_turn = nullptr;
-  bool can_play      = false;
-
+  
+  bool can_play  = false;
+  bool is_paused = false;
+  
   // Transforms
 
   nikola::Transform plane;
@@ -44,7 +46,29 @@ struct nikola::App {
 
 static void game_start_callback(const GameEvent& event, void* dispatcher, void* listener) {
   nikola::App* app = (nikola::App*)listener;
-  app->can_play    = (event.hud_type == HUD_GAME);
+
+  if(event.hud_type != HUD_GAME) {
+    app->can_play  = false;
+    app->is_paused = true;
+
+    nikola::input_cursor_show(true);
+    return;
+  }
+   
+  app->can_play  = true;
+  app->is_paused = false;
+  
+  // Roll the dice and have a new fresh start
+  // We also need to make sure we don't farkle (lose) right away
+ 
+  if(event.is_fresh_start) {
+    turn_start(*app->current_turn);
+    if(app->current_turn->is_farkle) {
+      turn_start(*app->current_turn);
+    }
+  }
+  
+  nikola::input_cursor_show(false);
 }
 
 /// Callbacks
@@ -134,7 +158,7 @@ void app_shutdown(nikola::App* app) {
 void app_update(nikola::App* app, const nikola::f64 delta_time) {
   // Quit the application when the specified exit key is pressed
   
-  if(nikola::input_key_pressed(nikola::KEY_ESCAPE)) {
+  if(nikola::input_key_pressed(nikola::KEY_F4)) {
     nikola::event_dispatch(nikola::Event{.type = nikola::EVENT_APP_QUIT});
     return;
   }
@@ -151,8 +175,25 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
   // Update the camera
   nikola::camera_update(app->frame.camera);
 
-  // Make sure that the game has started
+  // Toggle the pause menu
   
+  if(hud_manager_get_current_hud() == HUD_GAME && nikola::input_key_pressed(nikola::KEY_ESCAPE)) {
+    app->is_paused = !app->is_paused;
+
+    HUDType hud_type = app->is_paused ? HUD_PAUSE : HUD_GAME;
+
+    game_event_dispatch({
+      .type     = GAME_EVENT_HUD_CHANGED, 
+      .hud_type = (nikola::u32)hud_type, 
+    });
+  }
+  
+  // Can't play when paused! 
+  if(app->is_paused) {
+    return;
+  }
+
+  // Make sure that the game has started
   if(!app->can_play) {
     return;
   }

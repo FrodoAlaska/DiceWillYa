@@ -24,14 +24,8 @@ void turn_create(Turn* out_turn) {
   nikola::transform_translate(out_turn->cursor, out_turn->dices[0].transform.position);
   nikola::transform_scale(out_turn->cursor, nikola::Vec3(0.18f));
 
-  // Roll the dice and start an early turn
-  // We also need to make sure we don't farkle (lose) right away
-  
-  turn_start(*out_turn);
-  if(out_turn->is_farkle) {
-    turn_start(*out_turn);
-  }
-
+  // Play some nice music
+ 
   nikola::u32 random_music = nikola::random_u32(SOUND_MUSIC1, SOUND_MUSIC4);
   sound_manager_play((SoundType)random_music);
 }

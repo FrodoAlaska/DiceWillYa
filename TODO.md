@@ -2,11 +2,14 @@
 
 - Make the menus
     - [x] Main menu 
+    - [x] Settings 
+    - [x] Pause 
     - [] Controls 
-    - [] Settings 
-    - [] Pause 
     - [] Instructions
-- The main menu is a tavern sign with the game's name?
+
+- A sound effect for the ranked action
+- Add the binary file for the settings data
+- Perks?
 
 - Put the prototype on itch
     - [] Rename the game, project, and the directory to `dice_will_ya`
@@ -15,10 +18,6 @@
     - [] Make an itch page for it, and make it look nice
     - [] Get a few nice screenshots and GIFs for the page
     - [] Release the binary to itch 
-
-- Perks?
-- A sound effect for the ranked action and for UI click
-- Shuffle between the music during gameplay
 
 # Design Ideas
 

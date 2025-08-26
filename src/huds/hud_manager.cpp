@@ -30,6 +30,8 @@ void hud_manager_init(Turn* turn, nikola::Window* window) {
   // HUDs init 
 
   menu_hud_init(window);
+  settings_hud_init(window);
+  pause_hud_init(window);
   game_hud_init(turn, window);
 
   // Listen to events
@@ -58,15 +60,21 @@ void hud_manager_render() {
       menu_hud_render();
       break;
     case HUD_SETTINGS:
+      settings_hud_render();
       break;
     case HUD_CONTROLS:
       break;
     case HUD_PAUSE:
+      pause_hud_render();
       break;
     case HUD_GAME:
       game_hud_render();
       break;
   }
+}
+
+const HUDType hud_manager_get_current_hud() {
+  return s_hud.current_hud;
 }
 
 /// HUD manager functions

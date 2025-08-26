@@ -69,6 +69,8 @@ set(PROJECT_SOURCES
   ${PROJECT_SRC_DIR}/huds/hud_manager.cpp
   ${PROJECT_SRC_DIR}/huds/game_hud.cpp
   ${PROJECT_SRC_DIR}/huds/menu_hud.cpp
+  ${PROJECT_SRC_DIR}/huds/settings_hud.cpp
+  ${PROJECT_SRC_DIR}/huds/pause_hud.cpp
 )
 ############################################################
 

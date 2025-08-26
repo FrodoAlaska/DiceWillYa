@@ -33,6 +33,7 @@ struct GameEvent {
   nikola::u32 multiplier = 1;
 
   nikola::u32 hud_type;
+  bool is_fresh_start = false;
 };
 /// GameEvent
 /// ----------------------------------------------------------------------
