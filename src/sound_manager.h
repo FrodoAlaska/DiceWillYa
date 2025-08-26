@@ -37,7 +37,9 @@ void sound_manager_play(const SoundType type, const nikola::f32 pitch = 1.0f);
 
 void sound_manager_stop(const SoundType type);
 
-void sound_manager_set_volume(const nikola::f32 master, const nikola::f32 music, const nikola::f32 sfx);
+void sound_manager_set_volume(const nikola::f32 master);
+
+const nikola::f32 sound_manager_get_volume();
 
 /// Sound manager functions 
 /// ----------------------------------------------------------------------

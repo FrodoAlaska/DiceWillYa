@@ -64,9 +64,32 @@ static bool on_button_click(const nikola::Event& event, const void* dispatcher, 
 /// ----------------------------------------------------------------------
 
 /// ----------------------------------------------------------------------
+/// Private functions
+
+// @TODO: We can probably make an API out of this, but it doesn't seem worth it right now. 
+// Sorry...
+
+static void read_config_file(const nikola::FilePath& path) {
+  nikola::File cfg_file; 
+  if(!nikola::file_open(&cfg_file, path, (nikola::i32)(nikola::FILE_OPEN_BINARY | nikola::FILE_OPEN_READ))) {
+    NIKOLA_LOG_ERROR("Could not read from CFG file at \'%s\'", path.c_str());
+    return;
+  }
+
+  nikola::file_read_bytes(cfg_file, &s_manager.master_volume, sizeof(nikola::f32));
+  NIKOLA_LOG_TRACE("READ the value %f from config file", s_manager.master_volume);
+}
+
+/// Private functions
+/// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
 /// Sound manager functions 
 
 void sound_manager_init() {
+  // Config file init
+  read_config_file("config.nkcfg"); 
+
   // Sound effects init
 
   for(nikola::sizei i = SOUND_DICE_CHOOSE; i <= SOUND_UI_CLICK; i++) {
@@ -141,25 +164,13 @@ void sound_manager_stop(const SoundType type) {
   }
 }
 
-void sound_manager_set_volume(const nikola::f32 master, const nikola::f32 music, const nikola::f32 sfx) {
+void sound_manager_set_volume(const nikola::f32 master) {
   s_manager.master_volume = master; 
-  s_manager.music_volume  = music;
-  s_manager.sounds_volume = sfx; 
-
-  // Set master volume
   nikola::audio_listener_set_volume(master);
+}
 
-  // Set music volume
-
-  for(nikola::sizei i = SOUND_MUSIC1; i < SOUNDS_MAX; i++) {
-    nikola::audio_source_set_volume(s_manager.entries[i], music);
-  }
-
-  // Set sound effects volume
-
-  for(nikola::sizei i = SOUND_DICE_CHOOSE; i <= SOUND_FARKLED; i++) {
-    nikola::audio_source_set_volume(s_manager.entries[i], sfx);
-  }
+const nikola::f32 sound_manager_get_volume() {
+  return s_manager.master_volume;
 }
 
 /// Sound manager functions 

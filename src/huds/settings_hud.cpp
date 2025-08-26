@@ -1,6 +1,7 @@
 #include "hud_manager.h"
 #include "game_event.h"
 #include "resource_database.h"
+#include "sound_manager.h"
 
 #include <nikola/nikola_pch.h> 
 
@@ -19,12 +20,29 @@ struct SettingsHUD {
   nikola::UILayout layout;
 
   nikola::f32 master_volume = 1.0f; 
-  nikola::f32 music_volume  = 0.3f; 
-  nikola::f32 sounds_volume = 1.0f;
 };
 
 static SettingsHUD s_hud;
 /// MenuHUD
+/// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
+/// Private functions
+
+// @TODO: We can probably make an API out of this, but it doesn't seem worth it right now. 
+// Sorry...
+
+static void write_config_file(const nikola::FilePath& path) {
+  nikola::File cfg_file; 
+  if(!nikola::file_open(&cfg_file, path, (nikola::i32)(nikola::FILE_OPEN_BINARY | nikola::FILE_OPEN_WRITE))) {
+    NIKOLA_LOG_ERROR("Could not write to CFG file at \'%s\'", path.c_str());
+    return;
+  }
+
+  nikola::file_write_bytes(cfg_file, &s_hud.master_volume, sizeof(nikola::f32));
+}
+
+/// Private functions
 /// ----------------------------------------------------------------------
 
 /// ----------------------------------------------------------------------
@@ -33,7 +51,8 @@ static SettingsHUD s_hud;
 static bool settings_buttons_callback(const nikola::Event& event, const void* dispatcher, const void* listener) {
   switch(event.button->id) {
     case BUTTON_APPLY:
-      // @TODO: Save settings file
+      write_config_file("config.nkcfg");
+      sound_manager_set_volume(s_hud.master_volume);
       break;
     case BUTTON_MENU:
       game_event_dispatch({
@@ -54,7 +73,9 @@ static bool settings_buttons_callback(const nikola::Event& event, const void* di
 
 void settings_hud_init(nikola::Window* window) {
   // HUD init  
-  
+
+  s_hud.master_volume = sound_manager_get_volume();
+
   nikola::ui_layout_create(&s_hud.layout, window, resource_database_get(RESOURCE_FONT));
   s_hud.layout.buttons_padding = nikola::Vec2(40.0f, 8.0f);
 
