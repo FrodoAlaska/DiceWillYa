@@ -6,8 +6,8 @@
     - [x] Pause 
     - [x] Instructions
 
-- A sound effect for the ranked action
 - Add the binary file for the settings data
+- A sound effect for the ranked action
 
 - Put the prototype on itch
     - [] Rename the game, project, and the directory to `dice_will_ya`
