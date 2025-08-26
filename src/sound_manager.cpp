@@ -9,7 +9,7 @@
 struct SoundManager {
   nikola::AudioSourceID entries[SOUNDS_MAX];
 
-  nikola::f32 master_volume = 1.0f; 
+  nikola::f32 master_volume = 0.0f; 
   nikola::f32 music_volume  = 0.3f;
   nikola::f32 sounds_volume = 1.0f; 
 };

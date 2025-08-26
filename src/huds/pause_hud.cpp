@@ -8,7 +8,7 @@
 /// PauseButtonID 
 enum PauseButtonID {
   BUTTON_RESUME = 0x02,
-  BUTTON_CONTROLS,
+  BUTTON_INSTRUCTIONS,
   BUTTON_MENU,
 };
 /// PauseButtonID 
@@ -35,10 +35,10 @@ static bool pause_buttons_callback(const nikola::Event& event, const void* dispa
         .hud_type = (nikola::u32)HUD_GAME,
       });      
       break;
-    case BUTTON_CONTROLS:
+    case BUTTON_INSTRUCTIONS:
       game_event_dispatch({
         .type     = GAME_EVENT_HUD_CHANGED, 
-        .hud_type = (nikola::u32)HUD_CONTROLS,
+        .hud_type = (nikola::u32)HUD_INSTRUCTIONS,
       });      
     case BUTTON_MENU:
       game_event_dispatch({
@@ -77,12 +77,12 @@ void pause_hud_init(nikola::Window* window) {
                                 BUTTON_RESUME, 
                                 nikola::Vec2(0.0f, -40.0f));
   nikola::ui_layout_push_button(s_hud.layout, 
-                                "Controls", 
+                                "Instructions", 
                                 30.0f, 
                                 nikola::Vec4(1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f),
-                                BUTTON_CONTROLS,
+                                BUTTON_INSTRUCTIONS,
                                 nikola::Vec2(0.0f, -40.0f));
   nikola::ui_layout_push_button(s_hud.layout, 
                                 "Menu", 

@@ -86,28 +86,9 @@ void turn_process_input(Turn& turn) {
     };
     game_event_dispatch(event);
   } 
-
-  // Start turn
-
-  if(turn.rolls_count > 0 && nikola::input_key_pressed(nikola::KEY_R)) {
-    turn_start(turn);
-    turn.rolls_count--;
-  }
-
-  // Continue turn
-
-  if(nikola::input_key_pressed(nikola::KEY_C)) {
-    turn_continue(turn);
-  }
   
   if(turn.rolls_count < 0) { // Clamp the rolls count
     turn.rolls_count = 0;
-  }
-  
-  // Bank turn 
-
-  if(nikola::input_key_pressed(nikola::KEY_B)) {
-    turn_bank(turn);
   }
 }
 

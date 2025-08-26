@@ -51,7 +51,6 @@ static void game_start_callback(const GameEvent& event, void* dispatcher, void* 
     app->can_play  = false;
     app->is_paused = true;
 
-    nikola::input_cursor_show(true);
     return;
   }
    
@@ -67,8 +66,6 @@ static void game_start_callback(const GameEvent& event, void* dispatcher, void* 
       turn_start(*app->current_turn);
     }
   }
-  
-  nikola::input_cursor_show(false);
 }
 
 /// Callbacks
@@ -176,10 +173,12 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
   nikola::camera_update(app->frame.camera);
 
   // Toggle the pause menu
-  
-  if(hud_manager_get_current_hud() == HUD_GAME && nikola::input_key_pressed(nikola::KEY_ESCAPE)) {
-    app->is_paused = !app->is_paused;
 
+  HUDType current_hud = hud_manager_get_current_hud();
+  bool is_valid_hud   = (current_hud == HUD_GAME || current_hud == HUD_PAUSE);
+  
+  if(is_valid_hud && nikola::input_key_pressed(nikola::KEY_ESCAPE)) {
+    app->is_paused   = !app->is_paused;
     HUDType hud_type = app->is_paused ? HUD_PAUSE : HUD_GAME;
 
     game_event_dispatch({

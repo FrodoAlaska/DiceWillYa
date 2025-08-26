@@ -44,7 +44,7 @@ void hud_manager_update() {
       break;
     case HUD_SETTINGS:
       break;
-    case HUD_CONTROLS:
+    case HUD_INSTRUCTIONS:
       break;
     case HUD_PAUSE:
       break;
@@ -62,7 +62,7 @@ void hud_manager_render() {
     case HUD_SETTINGS:
       settings_hud_render();
       break;
-    case HUD_CONTROLS:
+    case HUD_INSTRUCTIONS:
       break;
     case HUD_PAUSE:
       pause_hud_render();

@@ -9,7 +9,7 @@
 enum MenuButtonID {
   BUTTON_PLAY = 0xFF, 
   BUTTON_SETTINGS, 
-  BUTTON_CONTROLS, 
+  BUTTON_INSTRUCTIONS, 
   BUTTON_QUIT,
 };
 /// MenuButtonID 
@@ -43,10 +43,10 @@ static bool menu_buttons_callback(const nikola::Event& event, const void* dispat
         .hud_type = (nikola::u32)HUD_SETTINGS,
       });  
       break;
-    case BUTTON_CONTROLS:
+    case BUTTON_INSTRUCTIONS:
       game_event_dispatch({
         .type     = GAME_EVENT_HUD_CHANGED, 
-        .hud_type = (nikola::u32)HUD_CONTROLS,
+        .hud_type = (nikola::u32)HUD_INSTRUCTIONS,
       });      
       break;
     case BUTTON_QUIT:
@@ -98,12 +98,12 @@ void menu_hud_init(nikola::Window* window) {
                                 nikola::Vec2(0.0f, -64.0f));
   
   nikola::ui_layout_push_button(s_hud.layout, 
-                                "Controls", 
+                                "Instructions", 
                                 30.0f, 
                                 nikola::Vec4(1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
                                 nikola::Vec4(0.0f, 0.0f, 0.0f, 1.0f), 
-                                BUTTON_CONTROLS,
+                                BUTTON_INSTRUCTIONS,
                                 nikola::Vec2(0.0f, -64.0f));
   
   nikola::ui_layout_push_button(s_hud.layout, 
