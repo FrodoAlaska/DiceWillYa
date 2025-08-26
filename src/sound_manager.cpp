@@ -9,7 +9,7 @@
 struct SoundManager {
   nikola::AudioSourceID entries[SOUNDS_MAX];
 
-  nikola::f32 master_volume = 0.0f; 
+  nikola::f32 master_volume = 1.0f; 
   nikola::f32 music_volume  = 0.3f;
   nikola::f32 sounds_volume = 1.0f; 
 };
@@ -128,9 +128,9 @@ void sound_manager_play(const SoundType type, const nikola::f32 pitch) {
     return;
   }
 
-  nikola::AudioSourceID source_id = s_manager.entries[(nikola::sizei)type];
-  nikola::audio_source_set_pitch(source_id, pitch);
-  nikola::audio_source_start(source_id);
+  // nikola::AudioSourceID source_id = s_manager.entries[(nikola::sizei)type];
+  // nikola::audio_source_set_pitch(source_id, pitch);
+  // nikola::audio_source_start(source_id);
 }
 
 void sound_manager_stop(const SoundType type) {

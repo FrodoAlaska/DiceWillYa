@@ -71,3 +71,13 @@ void pause_hud_render();
 
 /// Pause hud functions
 /// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
+/// Instructions hud functions
+
+void instructions_hud_init(nikola::Window* window);
+
+void instructions_hud_render();
+
+/// Instructions hud functions
+/// ----------------------------------------------------------------------

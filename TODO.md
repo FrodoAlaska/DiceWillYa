@@ -4,7 +4,7 @@
     - [x] Main menu 
     - [x] Settings 
     - [x] Pause 
-    - [] Instructions
+    - [x] Instructions
 
 - A sound effect for the ranked action
 - Add the binary file for the settings data

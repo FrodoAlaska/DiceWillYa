@@ -67,7 +67,9 @@ static bool menu_buttons_callback(const nikola::Event& event, const void* dispat
 
 void menu_hud_init(nikola::Window* window) {
   // HUD init  
+  
   nikola::ui_layout_create(&s_hud.layout, window, resource_database_get(RESOURCE_FONT));
+  s_hud.layout.buttons_padding = nikola::Vec2(40.0f, 8.0f);
 
   // Layout setup 
 
@@ -75,9 +77,7 @@ void menu_hud_init(nikola::Window* window) {
   nikola::ui_layout_push_text(s_hud.layout, "Play Dice With Me, Will Ya?", 50.0f, nikola::Vec4(1.0f));
   nikola::ui_layout_end(s_hud.layout);
   
-  nikola::ui_layout_begin(s_hud.layout, nikola::UI_ANCHOR_CENTER, nikola::Vec2(0.0f, 64.0f));
- 
-  s_hud.layout.buttons_padding = nikola::Vec2(40.0f, 8.0f);
+  nikola::ui_layout_begin(s_hud.layout, nikola::UI_ANCHOR_CENTER, nikola::Vec2(0.0f, 54.0f));
 
   nikola::ui_layout_push_button(s_hud.layout, 
                                 "Play", 

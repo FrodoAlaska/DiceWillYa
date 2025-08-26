@@ -32,6 +32,7 @@ void hud_manager_init(Turn* turn, nikola::Window* window) {
   menu_hud_init(window);
   settings_hud_init(window);
   pause_hud_init(window);
+  instructions_hud_init(window);
   game_hud_init(turn, window);
 
   // Listen to events
@@ -63,6 +64,7 @@ void hud_manager_render() {
       settings_hud_render();
       break;
     case HUD_INSTRUCTIONS:
+      instructions_hud_render();
       break;
     case HUD_PAUSE:
       pause_hud_render();
