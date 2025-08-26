@@ -22,7 +22,7 @@ static SoundManager s_manager;
 /// Callbacks
 
 static void sound_events_callbacks(const GameEvent& event, void* dispatcher, void* listener) {
-  SoundType sound_type = SOUNDS_MAX;
+  SoundType sound_type = (SoundType)-1;
 
   switch(event.type) {
     case GAME_EVENT_FARKLED:
@@ -76,8 +76,8 @@ void sound_manager_init() {
 
   // Music init
 
-  for(nikola::sizei i = 0; i < 4; i++) {
-    ResourceType res_type = (ResourceType)((nikola::sizei)(RESOURCE_MUSIC1 + i));
+  for(nikola::sizei i = SOUND_MUSIC1; i < SOUNDS_MAX; i++) {
+    ResourceType res_type = (ResourceType)((nikola::sizei)(RESOURCE_SOUND_DICE_CHOOSE + i));
 
     nikola::AudioSourceDesc audio_desc; 
     audio_desc.volume        = s_manager.music_volume; 
@@ -85,7 +85,7 @@ void sound_manager_init() {
     audio_desc.is_looping    = true;
     audio_desc.buffers[0]    = nikola::resources_get_audio_buffer(resource_database_get(res_type));
 
-    s_manager.entries[SOUND_MUSIC1 + i] = nikola::audio_source_create(audio_desc); 
+    s_manager.entries[i] = nikola::audio_source_create(audio_desc); 
   }
 
   // Audio listener init
@@ -115,6 +115,11 @@ void sound_manager_shutdown() {
 }
 
 void sound_manager_play(const SoundType type, const nikola::f32 pitch) {
+  if(type < SOUND_DICE_CHOOSE || type >= SOUNDS_MAX) {
+    NIKOLA_LOG_ERROR("Invalid sound type given to sound_manager_play! %i", (nikola::i32)type);
+    return;
+  }
+
   // nikola::AudioSourceID source_id = s_manager.entries[(nikola::sizei)type];
   // nikola::audio_source_start(source_id);
 }

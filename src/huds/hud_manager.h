@@ -8,8 +8,8 @@
 /// HUDType
 enum HUDType {
   HUD_MAIN_MENU = 0, 
-  HUD_INSTRUCTIONS,
   HUD_SETTINGS, 
+  HUD_CONTROLS,
   HUD_PAUSE,
   HUD_GAME, 
 };
@@ -38,4 +38,14 @@ void game_hud_update();
 void game_hud_render();
 
 /// Game hud functions
+/// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
+/// Menu hud functions
+
+void menu_hud_init(nikola::Window* window);
+
+void menu_hud_render();
+
+/// Menu hud functions
 /// ----------------------------------------------------------------------

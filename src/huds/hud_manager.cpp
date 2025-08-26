@@ -6,7 +6,7 @@
 /// ----------------------------------------------------------------------
 /// HUDManager
 struct HUDManager {
-  HUDType current_hud = HUD_GAME;
+  HUDType current_hud = HUD_MAIN_MENU;
 };
 
 static HUDManager s_hud;
@@ -28,7 +28,8 @@ static void hud_event_callback(const GameEvent& event, void* dispatcher, void* l
 
 void hud_manager_init(Turn* turn, nikola::Window* window) {
   // HUDs init 
-  
+
+  menu_hud_init(window);
   game_hud_init(turn, window);
 
   // Listen to events
@@ -39,9 +40,9 @@ void hud_manager_update() {
   switch(s_hud.current_hud) {
     case HUD_MAIN_MENU:
       break;
-    case HUD_INSTRUCTIONS:
-      break;
     case HUD_SETTINGS:
+      break;
+    case HUD_CONTROLS:
       break;
     case HUD_PAUSE:
       break;
@@ -54,10 +55,11 @@ void hud_manager_update() {
 void hud_manager_render() {
   switch(s_hud.current_hud) {
     case HUD_MAIN_MENU:
-      break;
-    case HUD_INSTRUCTIONS:
+      menu_hud_render();
       break;
     case HUD_SETTINGS:
+      break;
+    case HUD_CONTROLS:
       break;
     case HUD_PAUSE:
       break;

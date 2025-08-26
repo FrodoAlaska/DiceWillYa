@@ -26,6 +26,7 @@ struct nikola::App {
   
   Turn player_turn; 
   Turn* current_turn = nullptr;
+  bool can_play      = false;
 
   // Transforms
 
@@ -36,6 +37,17 @@ struct nikola::App {
   bool has_editor = false;
 };
 /// App
+/// ----------------------------------------------------------------------
+
+/// ----------------------------------------------------------------------
+/// Callbacks
+
+static void game_start_callback(const GameEvent& event, void* dispatcher, void* listener) {
+  nikola::App* app = (nikola::App*)listener;
+  app->can_play    = (event.hud_type == HUD_GAME);
+}
+
+/// Callbacks
 /// ----------------------------------------------------------------------
 
 /// ----------------------------------------------------------------------
@@ -103,6 +115,9 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   nikola::transform_translate(app->plane, nikola::Vec3(10.0f, 5.0f, 0.15f));
   nikola::transform_rotate(app->plane, nikola::Vec3(1.0f, 0.0f, 0.0f), 4.7f);
   nikola::transform_scale(app->plane, nikola::Vec3(15.0f));
+  
+  // Listen to events
+  game_event_listen(GAME_EVENT_HUD_CHANGED, game_start_callback, app); 
 
   return app;
 }
@@ -136,6 +151,12 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
   // Update the camera
   nikola::camera_update(app->frame.camera);
 
+  // Make sure that the game has started
+  
+  if(!app->can_play) {
+    return;
+  }
+
   // Turn update
  
   turn_process_input(*app->current_turn);
@@ -155,16 +176,18 @@ void app_render(nikola::App* app) {
 
   // Plane
   nikola::renderer_queue_model(resource_database_get(RESOURCE_TABLE), app->plane);
- 
-  // Dices 
 
-  nikola::ResourceID dice_id = resource_database_get(RESOURCE_DICE);
-  for(nikola::sizei i = 0; i < DICES_MAX; i++) {
-    nikola::renderer_queue_model(dice_id, app->current_turn->dices[i].transform);
+  if(app->can_play) {
+    // Dices 
+
+    nikola::ResourceID dice_id = resource_database_get(RESOURCE_DICE);
+    for(nikola::sizei i = 0; i < DICES_MAX; i++) {
+      nikola::renderer_queue_model(dice_id, app->current_turn->dices[i].transform);
+    }
+
+    // Cursor
+    nikola::renderer_queue_mesh(cube_id, app->current_turn->cursor, resource_database_get(RESOURCE_MATERIAL_TRANSPARENT));
   }
-
-  // Cursor
-  nikola::renderer_queue_mesh(cube_id, app->current_turn->cursor, resource_database_get(RESOURCE_MATERIAL_TRANSPARENT));
 
   nikola::renderer_end();
 

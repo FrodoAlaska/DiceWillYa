@@ -23,7 +23,7 @@ static GameHUD s_hud;
 void game_hud_init(Turn* turn, nikola::Window* window) {
   // HUD init  
 
-  s_hud.turn = turn; // Ew, ew, ew, ew
+  s_hud.turn = turn;
   nikola::ui_layout_create(&s_hud.layout, window, resource_database_get(RESOURCE_FONT));
 
   // Layout setup 
