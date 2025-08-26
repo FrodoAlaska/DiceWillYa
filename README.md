@@ -10,7 +10,22 @@ A take on the very old Farkle game in 3D. Play through it and score as much as p
 
 ---
 
-## Build 
+## Dependencies 
+
+- [Nikola Game Engine](https://github.com/FrodoAlaska/Nikola.git)
+
+## Build Instructions
+
+This game uses _CMake_ for the build process. Running the command below in sequence will clone the game, generate the necessary build files, and compile the project.
+
+```
+git clone https://github.com/FrodoAlaska/DiceWillYa.git
+
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
+Be prepared to wait for a while since the game fetches all its dependencies and builds them as well. However, after the compilation process is complete, you can play the game right away if you have the necessary assets for the game.
 
 ## Credits
 
