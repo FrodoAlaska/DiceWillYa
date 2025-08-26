@@ -44,7 +44,7 @@ static void sound_events_callbacks(const GameEvent& event, void* dispatcher, voi
       sound_type = SOUND_DICE_ROLL;
       break;
     case GAME_EVENT_RANKED:
-      // @TODO
+      sound_type = SOUND_RANKED;
       break;
     case GAME_EVENT_DICE_SELECTED:
       sound_type = SOUND_DICE_CHOOSE;
@@ -77,7 +77,6 @@ static void read_config_file(const nikola::FilePath& path) {
   }
 
   nikola::file_read_bytes(cfg_file, &s_manager.master_volume, sizeof(nikola::f32));
-  NIKOLA_LOG_TRACE("READ the value %f from config file", s_manager.master_volume);
 }
 
 /// Private functions

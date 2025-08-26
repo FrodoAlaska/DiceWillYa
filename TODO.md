@@ -1,7 +1,5 @@
 # TODO 
 
-- A sound effect for the ranked action
-
 - Put the prototype on itch
     - [] Rename the game, project, and the directory to `dice_will_ya`
     - [] Rebuild the whole project in distribution mode
