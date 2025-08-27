@@ -1,9 +1,9 @@
 pushd build 
 
-cmake --build . --config Debug --parallel 12
+cmake --build . --config Release --parallel 12
 if %ERRORLEVEL% NEQ 0 goto error
 
-.\Debug\epona.exe 
+.\Release\dice_will_ya.exe 
 
 popd
 

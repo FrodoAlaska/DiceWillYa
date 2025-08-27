@@ -2,7 +2,7 @@
 
 #include <nikola/nikola_app.h>
 
-int main(int argc, char** argv) {
+int engine_main(int argc, char** argv) {
   // Some useful flags
   int win_flags = nikola::WINDOW_FLAGS_FOCUS_ON_CREATE | 
                   nikola::WINDOW_FLAGS_FULLSCREEN      |
@@ -15,9 +15,9 @@ int main(int argc, char** argv) {
     .update_fn   = app_update, 
     
     .render_fn     = app_render, 
-    .render_gui_fn = app_render_gui, 
+    .render_gui_fn = nullptr, 
 
-    .window_title  = "Code name - Epona", 
+    .window_title  = "Play Dice With Me, Will Ya?", 
     .window_width  = 1600, 
     .window_height = 900, 
     .window_flags  = win_flags,
@@ -37,3 +37,19 @@ int main(int argc, char** argv) {
 
   return 0;
 }
+
+#ifdef DIST_BUILD
+
+// Yeah, unfortunate...
+#if NIKOLA_PLATFORM_WINDOWS == 1 
+#include <windows.h>
+#endif
+
+NIKOLA_MAIN(engine_main);
+
+#else 
+int main(int argc, char** argv) {
+  return engine_main(argc, argv);
+}
+
+#endif

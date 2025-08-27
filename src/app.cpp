@@ -100,9 +100,6 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
   app->resource_group = nikola::resources_create_group("app_res", "./");
   resource_database_init(app->resource_group);
 
-  // GUI init
-  nikola::gui_init(window);
-
   // Skybox init
   app->frame.skybox_id = resource_database_get(RESOURCE_SKYBOX);
 
@@ -145,8 +142,6 @@ nikola::App* app_init(const nikola::Args& args, nikola::Window* window) {
 
 void app_shutdown(nikola::App* app) {
   sound_manager_shutdown();
-
-  nikola::gui_shutdown();
   nikola::resources_destroy_group(app->resource_group); 
 
   delete app;
@@ -158,15 +153,6 @@ void app_update(nikola::App* app, const nikola::f64 delta_time) {
   if(nikola::input_key_pressed(nikola::KEY_F4)) {
     nikola::event_dispatch(nikola::Event{.type = nikola::EVENT_APP_QUIT});
     return;
-  }
-
-  // Disable/enable the GUI
-  
-  if(nikola::input_key_pressed(nikola::KEY_F1)) {
-    app->has_editor             = !app->has_editor;
-    app->frame.camera.is_active = !app->has_editor;
-
-    nikola::input_cursor_show(app->has_editor);
   }
 
   // Update the camera
@@ -240,65 +226,6 @@ void app_render(nikola::App* app) {
   popup_manager_render();
   
   nikola::batch_renderer_end();
-}
-
-void app_render_gui(nikola::App* app) {
-  if(!app->has_editor) {
-    return;
-  }
-
-  nikola::gui_begin();
-  nikola::gui_debug_info();
-  
-  nikola::gui_begin_panel("Main");
- 
-  // Entities 
-
-  if(ImGui::CollapsingHeader("Entities")) {
-    nikola::gui_edit_transform("Plane", &app->plane);
-    nikola::gui_edit_transform("Dice", &app->current_turn->dices[0].transform);
-  }
-
-  // Lights
-  
-  if(ImGui::CollapsingHeader("Lights")) {
-    nikola::gui_edit_directional_light("Directional", &app->frame.dir_light);
-
-    for(int i = 0; i < app->frame.point_lights.size(); i++) {
-      nikola::PointLight* light = &app->frame.point_lights[i];
-      nikola::String light_name = ("Point " + std::to_string(i));
-
-      nikola::gui_edit_point_light(light_name.c_str(), light);
-    }
-    
-    for(int i = 0; i < app->frame.spot_lights.size(); i++) {
-      nikola::SpotLight* light = &app->frame.spot_lights[i];
-      nikola::String light_name = ("Spot " + std::to_string(i));
-
-      nikola::gui_edit_spot_light(light_name.c_str(), light);
-    }
- 
-    ImGui::Separator();
-    if(ImGui::Button("Add PointLight")) {
-      nikola::Vec3 point_pos = nikola::Vec3(10.0f, 5.0f, 10.0f);
-      app->frame.point_lights.push_back(nikola::PointLight(point_pos));
-    }
-    
-    if(ImGui::Button("Add SpotLight")) {
-      nikola::Vec3 spot_pos = nikola::Vec3(10.0f, 5.0f, 10.0f);
-      app->frame.spot_lights.push_back(nikola::SpotLight());
-    }
-  }
-
-  // Camera
-  
-  if(ImGui::CollapsingHeader("Camera")) {
-    nikola::gui_edit_camera("Editor Camera", &app->frame.camera); 
-    ImGui::DragFloat3("Ambient", &app->frame.ambient[0], 0.1f, 0.0f, 1.0f);
-  }
-
-  nikola::gui_end_panel();
-  nikola::gui_end();
 }
 
 /// App functions 

@@ -77,7 +77,8 @@ set(PROJECT_SOURCES
 
 ### Targets ###
 ############################################################
-if(NIKOLA_DISTRIBUTE)
+if(DIST_BUILD)
+  add_definitions("-DDIST_BUILD")
   set(EXE_TYPE WIN32)
 else()
   set(EXE_TYPE "")
