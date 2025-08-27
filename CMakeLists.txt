@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(epona)
+project(dice_will_ya)
 
 ### FetchContent ###
 ############################################################
